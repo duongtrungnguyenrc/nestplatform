@@ -20,7 +20,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@nestplatform/common": "^1.0.0",
     "@nestplatform/transactional": "^1.0.0",
     "@nestplatform/transactional-typeorm": "^1.0.0",
     "@nestjs/common": "^11.0.1",

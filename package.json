@@ -17,8 +17,11 @@
       "prettier --write"
     ]
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "nestjs",
+    "nestjsplatform"
+  ],
+  "author": "Đường Trung Nguyên",
   "license": "ISC",
   "type": "commonjs",
   "workspaces": [
