@@ -1,6 +1,6 @@
 {
   "name": "basic",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "",
   "author": "",
   "private": true,
@@ -20,15 +20,15 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@nestplatform/transactional": "^1.0.0",
-    "@nestplatform/transactional-typeorm": "^1.0.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
+    "@nestplatform/transactional": "^1.0.1",
+    "@nestplatform/transactional-typeorm": "^1.0.1",
+    "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "pg": "^8.16.3",
     "typeorm": "^0.3.20"
   },
   "devDependencies": {
