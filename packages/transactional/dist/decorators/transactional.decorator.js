@@ -7,6 +7,7 @@ const types_1 = require("../types");
 const TRANSACTIONAL_DEFAULTS = {
     propagation: types_1.TransactionPropagation.REQUIRED,
     logging: false,
+    rollbackOnError: true,
 };
 const Transactional = (options) => {
     const mergedOptions = {

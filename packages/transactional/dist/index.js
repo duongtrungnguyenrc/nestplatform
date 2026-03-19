@@ -19,5 +19,9 @@ __exportStar(require("./decorators"), exports);
 __exportStar(require("./transactional.module"), exports);
 __exportStar(require("./transactional.constant"), exports);
 __exportStar(require("./transaction-context"), exports);
+__exportStar(require("./transactional-feature.decoration"), exports);
+__exportStar(require("./transactional-metadata.accessor"), exports);
+__exportStar(require("./transactional-metadata.explorer"), exports);
+__exportStar(require("./transactional-event.publisher"), exports);
 __exportStar(require("./types"), exports);
 //# sourceMappingURL=index.js.map

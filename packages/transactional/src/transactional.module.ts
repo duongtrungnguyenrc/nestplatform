@@ -7,6 +7,7 @@ import { TransactionalModuleConfigAsync, TransactionalModuleConfigSync } from ".
 import { TransactionalMetadataExplorer } from "./transactional-metadata.explorer";
 import { TransactionalFeatureDecoration } from "./transactional-feature.decoration";
 import { TransactionalMetadataAccessor } from "./transactional-metadata.accessor";
+import { TransactionalEventPublisher } from "./transactional-event.publisher";
 
 @Module({})
 export class TransactionalModule extends ConfigurableModule {
@@ -15,7 +16,14 @@ export class TransactionalModule extends ConfigurableModule {
       global: true,
       module: TransactionalModule,
       imports: [FeatureExplorerModule],
-      providers: [TransactionAdapterProvider(config), TransactionalMetadataExplorer, TransactionalMetadataAccessor, TransactionalFeatureDecoration],
+      providers: [
+        TransactionAdapterProvider(config),
+        TransactionalMetadataExplorer,
+        TransactionalMetadataAccessor,
+        TransactionalFeatureDecoration,
+        TransactionalEventPublisher,
+      ],
+      exports: [TransactionalEventPublisher],
     });
   }
 
@@ -29,7 +37,9 @@ export class TransactionalModule extends ConfigurableModule {
         TransactionalMetadataExplorer,
         TransactionalMetadataAccessor,
         TransactionalFeatureDecoration,
+        TransactionalEventPublisher,
       ],
+      exports: [TransactionalEventPublisher],
     });
   }
 }

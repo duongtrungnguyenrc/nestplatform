@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import { TransactionSynchronization } from "./interfaces";
 
 /**
  * Transaction store containing the active transaction handle and its adapter.
@@ -10,6 +11,9 @@ export type TransactionStore = {
 
   /** The adapter key that owns this transaction */
   adapterKey: string;
+
+  /** Registered synchronizations for the current transaction */
+  synchronizations?: TransactionSynchronization[];
 };
 
 /**
@@ -43,5 +47,73 @@ export class TransactionContext {
    */
   static getTransaction<T = any>(): T | undefined {
     return this.storage.getStore()?.transaction;
+  }
+
+  /**
+   * Register a synchronization with the current transaction context.
+   * If no transaction is active, the synchronization will not be registered.
+   *
+   * @param synchronization - The synchronization to register
+   */
+  static addSynchronization(synchronization: TransactionSynchronization): void {
+    const store = this.getStore();
+    if (store) {
+      if (!store.synchronizations) {
+        store.synchronizations = [];
+      }
+      store.synchronizations.push(synchronization);
+    }
+  }
+
+  /**
+   * Invoke beforeCommit hooks for all registered synchronizations.
+   * Internal use only (by adapters).
+   */
+  static async invokeBeforeCommit(): Promise<void> {
+    const store = this.getStore();
+    if (store?.synchronizations) {
+      for (const sync of store.synchronizations) {
+        await sync.beforeCommit?.();
+      }
+    }
+  }
+
+  /**
+   * Invoke afterCommit hooks for all registered synchronizations.
+   * Internal use only (by adapters).
+   */
+  static async invokeAfterCommit(): Promise<void> {
+    const store = this.getStore();
+    if (store?.synchronizations) {
+      for (const sync of store.synchronizations) {
+        await sync.afterCommit?.();
+      }
+    }
+  }
+
+  /**
+   * Invoke afterRollback hooks for all registered synchronizations.
+   * Internal use only (by adapters).
+   */
+  static async invokeAfterRollback(error: any): Promise<void> {
+    const store = this.getStore();
+    if (store?.synchronizations) {
+      for (const sync of store.synchronizations) {
+        await sync.afterRollback?.(error);
+      }
+    }
+  }
+
+  /**
+   * Invoke afterCompletion hooks for all registered synchronizations.
+   * Internal use only (by adapters).
+   */
+  static async invokeAfterCompletion(status: "committed" | "rolled-back"): Promise<void> {
+    const store = this.getStore();
+    if (store?.synchronizations) {
+      for (const sync of store.synchronizations) {
+        await sync.afterCompletion?.(status);
+      }
+    }
   }
 }

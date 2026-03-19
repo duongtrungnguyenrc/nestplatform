@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TransactionIsolation = exports.TransactionPropagation = void 0;
+exports.TransactionPhase = exports.TransactionIsolation = exports.TransactionPropagation = void 0;
 var TransactionPropagation;
 (function (TransactionPropagation) {
     TransactionPropagation["REQUIRED"] = "REQUIRED";
@@ -14,4 +14,11 @@ var TransactionIsolation;
     TransactionIsolation["REPEATABLE_READ"] = "REPEATABLE READ";
     TransactionIsolation["SERIALIZABLE"] = "SERIALIZABLE";
 })(TransactionIsolation || (exports.TransactionIsolation = TransactionIsolation = {}));
+var TransactionPhase;
+(function (TransactionPhase) {
+    TransactionPhase["BEFORE_COMMIT"] = "BEFORE_COMMIT";
+    TransactionPhase["AFTER_COMMIT"] = "AFTER_COMMIT";
+    TransactionPhase["AFTER_ROLLBACK"] = "AFTER_ROLLBACK";
+    TransactionPhase["AFTER_COMPLETION"] = "AFTER_COMPLETION";
+})(TransactionPhase || (exports.TransactionPhase = TransactionPhase = {}));
 //# sourceMappingURL=transactional.type.js.map

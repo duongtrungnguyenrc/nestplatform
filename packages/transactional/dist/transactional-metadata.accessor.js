@@ -25,6 +25,12 @@ let TransactionalMetadataAccessor = class TransactionalMetadataAccessor extends 
     getNoTransactionalMetadata(target) {
         return this.getMetadata(transactional_constant_1.NO_TRANSACTIONAL_METADATA, target);
     }
+    getEventListenerMetadata(target) {
+        return this.getMetadata(transactional_constant_1.TRANSACTIONAL_EVENT_LISTENER_METADATA, target);
+    }
+    getTransactionalEventMetadata(target) {
+        return this.getMetadata(transactional_constant_1.TRANSACTIONAL_EVENT_METADATA, target);
+    }
 };
 exports.TransactionalMetadataAccessor = TransactionalMetadataAccessor;
 exports.TransactionalMetadataAccessor = TransactionalMetadataAccessor = __decorate([

@@ -15,4 +15,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./transactional.decorator"), exports);
+__exportStar(require("./transactional-event-listener.decorator"), exports);
+__exportStar(require("./transactional-event.decorator"), exports);
 //# sourceMappingURL=index.js.map

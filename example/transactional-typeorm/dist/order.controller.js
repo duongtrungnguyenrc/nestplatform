@@ -23,6 +23,15 @@ let OrderController = class OrderController {
     async createOrder(body) {
         return this.orderService.createOrder(body.productName, body.amount);
     }
+    async createOrderWithEvent(body) {
+        return this.orderService.createOrderWithEvent(body.productName, body.amount);
+    }
+    async createOrderDeclarative(body) {
+        return this.orderService.createOrderDeclarative(body.productName, body.amount);
+    }
+    async testRollback() {
+        return this.orderService.processWithConditionalRollback();
+    }
     async findAll() {
         return this.orderService.findAll();
     }
@@ -38,6 +47,26 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], OrderController.prototype, "createOrder", null);
+__decorate([
+    (0, common_1.Post)('with-event'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], OrderController.prototype, "createOrderWithEvent", null);
+__decorate([
+    (0, common_1.Post)('create-declarative'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], OrderController.prototype, "createOrderDeclarative", null);
+__decorate([
+    (0, common_1.Post)('test-rollback'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], OrderController.prototype, "testRollback", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),

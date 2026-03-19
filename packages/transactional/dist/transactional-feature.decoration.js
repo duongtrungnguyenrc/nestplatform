@@ -43,6 +43,7 @@ let TransactionalFeatureDecoration = class TransactionalFeatureDecoration extend
                 const result = await adapter.execute(() => originalMethod.apply(proxiedInstance || instance, args), {
                     propagation: options.propagation || types_1.TransactionPropagation.REQUIRED,
                     isolation: options.isolation,
+                    rollbackOnError: options.rollbackOnError,
                 });
                 if (options.logging) {
                     common_1.Logger.log(`Transaction committed for \`${methodString}\``, LOGGING_CONTEXT);

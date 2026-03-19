@@ -14,13 +14,21 @@ const providers_1 = require("./providers");
 const transactional_metadata_explorer_1 = require("./transactional-metadata.explorer");
 const transactional_feature_decoration_1 = require("./transactional-feature.decoration");
 const transactional_metadata_accessor_1 = require("./transactional-metadata.accessor");
+const transactional_event_publisher_1 = require("./transactional-event.publisher");
 let TransactionalModule = TransactionalModule_1 = class TransactionalModule extends common_2.ConfigurableModule {
     static register(config) {
         return super.config(config, {
             global: true,
             module: TransactionalModule_1,
             imports: [common_2.FeatureExplorerModule],
-            providers: [(0, providers_1.TransactionAdapterProvider)(config), transactional_metadata_explorer_1.TransactionalMetadataExplorer, transactional_metadata_accessor_1.TransactionalMetadataAccessor, transactional_feature_decoration_1.TransactionalFeatureDecoration],
+            providers: [
+                (0, providers_1.TransactionAdapterProvider)(config),
+                transactional_metadata_explorer_1.TransactionalMetadataExplorer,
+                transactional_metadata_accessor_1.TransactionalMetadataAccessor,
+                transactional_feature_decoration_1.TransactionalFeatureDecoration,
+                transactional_event_publisher_1.TransactionalEventPublisher,
+            ],
+            exports: [transactional_event_publisher_1.TransactionalEventPublisher],
         });
     }
     static registerAsync(config) {
@@ -33,7 +41,9 @@ let TransactionalModule = TransactionalModule_1 = class TransactionalModule exte
                 transactional_metadata_explorer_1.TransactionalMetadataExplorer,
                 transactional_metadata_accessor_1.TransactionalMetadataAccessor,
                 transactional_feature_decoration_1.TransactionalFeatureDecoration,
+                transactional_event_publisher_1.TransactionalEventPublisher,
             ],
+            exports: [transactional_event_publisher_1.TransactionalEventPublisher],
         });
     }
 };

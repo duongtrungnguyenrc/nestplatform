@@ -6,6 +6,7 @@ import { TransactionalOptions, TransactionPropagation } from "../types";
 const TRANSACTIONAL_DEFAULTS: Required<Omit<TransactionalOptions, "adapter" | "isolation">> = {
   propagation: TransactionPropagation.REQUIRED,
   logging: false,
+  rollbackOnError: true,
 };
 
 /**

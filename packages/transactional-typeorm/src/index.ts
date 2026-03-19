@@ -4,6 +4,8 @@ import {
   TransactionExecuteOptions,
   TransactionPropagation,
   ITransactionAdapter,
+  RollbackOnError,
+  RollbackOnErrorPredicate,
 } from "@nestplatform/transactional";
 import { DataSource, QueryRunner } from "typeorm";
 
@@ -94,7 +96,11 @@ export class TypeOrmTransactionAdapter implements ITransactionAdapter {
 
       return result;
     } catch (error) {
-      await existingQueryRunner.query(`ROLLBACK TO SAVEPOINT "${savepointName}"`);
+      if (this.shouldRollback(error, options.rollbackOnError)) {
+        await existingQueryRunner.query(`ROLLBACK TO SAVEPOINT "${savepointName}"`);
+      } else {
+        await existingQueryRunner.query(`RELEASE SAVEPOINT "${savepointName}"`);
+      }
 
       throw error;
     }
@@ -173,15 +179,80 @@ export class TypeOrmTransactionAdapter implements ITransactionAdapter {
     try {
       const result: T = await TransactionContext.run(store, callback);
 
+      // Invoke beforeCommit
+      await TransactionContext.run(store, async () => {
+        await TransactionContext.invokeBeforeCommit();
+      });
+
       await queryRunner.commitTransaction();
+
+      // Invoke synchronizations
+      await TransactionContext.run(store, async () => {
+        await TransactionContext.invokeAfterCommit();
+        await TransactionContext.invokeAfterCompletion("committed");
+      });
 
       return result;
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      if (this.shouldRollback(error, options.rollbackOnError)) {
+        await queryRunner.rollbackTransaction();
+
+        // Invoke synchronizations
+        await TransactionContext.run(store, async () => {
+          await TransactionContext.invokeAfterRollback(error);
+          await TransactionContext.invokeAfterCompletion("rolled-back");
+        });
+      } else {
+        await queryRunner.commitTransaction();
+
+        // Invoke synchronizations
+        await TransactionContext.run(store, async () => {
+          await TransactionContext.invokeAfterCommit();
+          await TransactionContext.invokeAfterCompletion("committed");
+        });
+      }
 
       throw error;
     } finally {
       await queryRunner.release();
     }
+  }
+
+  /**
+   * Determine if the error should trigger a rollback based on options.
+   */
+  private shouldRollback(error: any, rollbackOnError?: RollbackOnError): boolean {
+    if (rollbackOnError === undefined || rollbackOnError === true) {
+      return true;
+    }
+
+    if (rollbackOnError === false) {
+      return false;
+    }
+
+    const errors = Array.isArray(rollbackOnError) ? rollbackOnError : [rollbackOnError];
+
+    for (const errOption of errors) {
+      if (typeof errOption === "string") {
+        if (error.name === errOption || error.constructor.name === errOption) {
+          return true;
+        }
+      } else if (typeof errOption === "function") {
+        // Check if it's a class constructor
+        if (error instanceof (errOption as any)) {
+          return true;
+        }
+        // Try as predicate
+        try {
+          if ((errOption as RollbackOnErrorPredicate)(error) === true) {
+            return true;
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    return false;
   }
 }
