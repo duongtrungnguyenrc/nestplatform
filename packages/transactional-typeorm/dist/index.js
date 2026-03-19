@@ -46,7 +46,12 @@ class TypeOrmTransactionAdapter {
             return result;
         }
         catch (error) {
-            await existingQueryRunner.query(`ROLLBACK TO SAVEPOINT "${savepointName}"`);
+            if (this.shouldRollback(error, options.rollbackOnError)) {
+                await existingQueryRunner.query(`ROLLBACK TO SAVEPOINT "${savepointName}"`);
+            }
+            else {
+                await existingQueryRunner.query(`RELEASE SAVEPOINT "${savepointName}"`);
+            }
             throw error;
         }
     }
@@ -98,16 +103,65 @@ class TypeOrmTransactionAdapter {
         };
         try {
             const result = await transactional_1.TransactionContext.run(store, callback);
+            await transactional_1.TransactionContext.run(store, async () => {
+                await transactional_1.TransactionContext.invokeBeforeCommit();
+            });
             await queryRunner.commitTransaction();
+            await transactional_1.TransactionContext.run(store, async () => {
+                await transactional_1.TransactionContext.invokeAfterCommit();
+                await transactional_1.TransactionContext.invokeAfterCompletion("committed");
+            });
             return result;
         }
         catch (error) {
-            await queryRunner.rollbackTransaction();
+            if (this.shouldRollback(error, options.rollbackOnError)) {
+                await queryRunner.rollbackTransaction();
+                await transactional_1.TransactionContext.run(store, async () => {
+                    await transactional_1.TransactionContext.invokeAfterRollback(error);
+                    await transactional_1.TransactionContext.invokeAfterCompletion("rolled-back");
+                });
+            }
+            else {
+                await queryRunner.commitTransaction();
+                await transactional_1.TransactionContext.run(store, async () => {
+                    await transactional_1.TransactionContext.invokeAfterCommit();
+                    await transactional_1.TransactionContext.invokeAfterCompletion("committed");
+                });
+            }
             throw error;
         }
         finally {
             await queryRunner.release();
         }
+    }
+    shouldRollback(error, rollbackOnError) {
+        if (rollbackOnError === undefined || rollbackOnError === true) {
+            return true;
+        }
+        if (rollbackOnError === false) {
+            return false;
+        }
+        const errors = Array.isArray(rollbackOnError) ? rollbackOnError : [rollbackOnError];
+        for (const errOption of errors) {
+            if (typeof errOption === "string") {
+                if (error.name === errOption || error.constructor.name === errOption) {
+                    return true;
+                }
+            }
+            else if (typeof errOption === "function") {
+                if (error instanceof errOption) {
+                    return true;
+                }
+                try {
+                    if (errOption(error) === true) {
+                        return true;
+                    }
+                }
+                catch {
+                }
+            }
+        }
+        return false;
     }
 }
 exports.TypeOrmTransactionAdapter = TypeOrmTransactionAdapter;

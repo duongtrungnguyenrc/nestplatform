@@ -14,10 +14,12 @@ const common_1 = require("@nestjs/common");
 const common_2 = require("@nestplatform/common");
 const transactional_feature_decoration_1 = require("./transactional-feature.decoration");
 const transactional_metadata_accessor_1 = require("./transactional-metadata.accessor");
+const transactional_event_publisher_1 = require("./transactional-event.publisher");
 let TransactionalMetadataExplorer = class TransactionalMetadataExplorer {
-    constructor(metadataAccessor, featureDecoration) {
+    constructor(metadataAccessor, featureDecoration, eventPublisher) {
         this.metadataAccessor = metadataAccessor;
         this.featureDecoration = featureDecoration;
+        this.eventPublisher = eventPublisher;
         this.classLevelOptions = new Map();
     }
     onProvider(ctx) {
@@ -29,15 +31,39 @@ let TransactionalMetadataExplorer = class TransactionalMetadataExplorer {
     }
     onMethod(ctx) {
         const { instance, methodName, methodRef, metatype } = ctx;
+        const listenerMetadata = this.metadataAccessor.getEventListenerMetadata(methodRef);
+        if (listenerMetadata) {
+            this.eventPublisher.registerListener({
+                ...listenerMetadata,
+                callback: (payload) => methodRef.apply(instance, [payload]),
+            });
+        }
         const isExcluded = this.metadataAccessor.getNoTransactionalMetadata(methodRef);
         if (isExcluded)
             return;
         const methodOptions = this.metadataAccessor.getTransactionalMetadata(methodRef);
         const classOptions = this.classLevelOptions.get(metatype);
         const resolvedOptions = methodOptions ? { ...classOptions, ...methodOptions } : classOptions;
-        if (!resolvedOptions)
-            return;
-        this.featureDecoration.wrapMethodWithTransaction(instance, methodName, methodRef, resolvedOptions);
+        const eventMetadata = this.metadataAccessor.getTransactionalEventMetadata(methodRef);
+        if (eventMetadata) {
+            const eventPublisher = this.eventPublisher;
+            const originalMethod = methodRef;
+            const wrappedWithEvent = async function (...args) {
+                const result = await originalMethod.apply(this, args);
+                const payload = eventMetadata.payload ? eventMetadata.payload(result) : result;
+                await eventPublisher.publish(eventMetadata.event, payload);
+                return result;
+            };
+            if (resolvedOptions) {
+                this.featureDecoration.wrapMethodWithTransaction(instance, methodName, wrappedWithEvent, resolvedOptions);
+            }
+            else {
+                instance[methodName] = wrappedWithEvent;
+            }
+        }
+        else if (resolvedOptions) {
+            this.featureDecoration.wrapMethodWithTransaction(instance, methodName, methodRef, resolvedOptions);
+        }
     }
 };
 exports.TransactionalMetadataExplorer = TransactionalMetadataExplorer;
@@ -45,6 +71,7 @@ exports.TransactionalMetadataExplorer = TransactionalMetadataExplorer = __decora
     (0, common_1.Injectable)(),
     (0, common_2.FeatureExplorer)(),
     __metadata("design:paramtypes", [transactional_metadata_accessor_1.TransactionalMetadataAccessor,
-        transactional_feature_decoration_1.TransactionalFeatureDecoration])
+        transactional_feature_decoration_1.TransactionalFeatureDecoration,
+        transactional_event_publisher_1.TransactionalEventPublisher])
 ], TransactionalMetadataExplorer);
 //# sourceMappingURL=transactional-metadata.explorer.js.map

@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -10,15 +6,24 @@ import {
   Transactional,
   NoTransactional,
   TransactionPropagation,
+  TransactionalEventPublisher,
+  TransactionalEventListener,
+  TransactionalEvent,
+  TransactionPhase,
 } from '@nestplatform/transactional';
 
 import { Order } from './order.entity';
 
+// Test rollback exception
+export class BusinessException extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'BusinessException';
+  }
+}
+
 /**
  * Example service demonstrating @Transactional with TypeORM.
- *
- * Class-level @Transactional() wraps all methods in a transaction by default.
- * Use @NoTransactional() to opt-out specific methods.
  */
 @Transactional()
 @Injectable()
@@ -28,12 +33,91 @@ export class OrderService {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
+    private readonly eventPublisher: TransactionalEventPublisher,
   ) {}
 
   /**
+   * Create an order and publish an event.
+   * The event listener will only trigger if the transaction commits.
+   */
+  async createOrderWithEvent(
+    productName: string,
+    amount: number,
+  ): Promise<Order> {
+    this.logger.log(`Creating order (with event) for ${productName}`);
+
+    const order = this.orderRepo.create({
+      productName,
+      amount,
+      status: 'pending',
+    });
+
+    const savedOrder = await this.orderRepo.save(order);
+
+    // Publish a transactional event
+    await this.eventPublisher.publish('order.created', savedOrder);
+
+    return savedOrder;
+  }
+
+  /**
+   * Create an order and publish an event declaratively using @TransactionalEvent.
+   */
+  @TransactionalEvent('order.created')
+  async createOrderDeclarative(
+    productName: string,
+    amount: number,
+  ): Promise<Order> {
+    this.logger.log(`Creating order (declarative event) for ${productName}`);
+
+    const order = this.orderRepo.create({
+      productName,
+      amount,
+      status: 'pending',
+    });
+
+    return this.orderRepo.save(order);
+  }
+
+  /**
+   * Transactional Event Listener - runs AFTER_COMMIT by default.
+   */
+  @TransactionalEventListener('order.created', {
+    phase: TransactionPhase.AFTER_COMMIT,
+  })
+  async onOrderCreated(order: Order) {
+    this.logger.log(
+      `[EVENT] Order ${order.id} committed! Sending confirmation email...`,
+    );
+  }
+
+  /**
+   * Transactional Event Listener - runs AFTER_ROLLBACK.
+   */
+  @TransactionalEventListener('order.created', {
+    phase: TransactionPhase.AFTER_ROLLBACK,
+  })
+  async onOrderFailed(order: Order) {
+    this.logger.warn(`[EVENT] Order ${order.id} failed! Notifying support...`);
+  }
+
+  /**
+   * Conditional rollback example using error name (string).
+   * Transaction will ONLY rollback for 'BusinessException'.
+   */
+  @Transactional({ rollbackOnError: 'BusinessException' })
+  async processWithConditionalRollback(): Promise<void> {
+    await this.orderRepo.save({
+      productName: 'Temp',
+      amount: 10,
+      status: 'processing',
+    });
+
+    throw new BusinessException('Test Error');
+  }
+
+  /**
    * Create an order - runs in a transaction (class-level default).
-   *
-   * If any step fails, the entire operation is rolled back.
    */
   async createOrder(productName: string, amount: number): Promise<Order> {
     this.logger.log(`Creating order for ${productName}`);
@@ -61,9 +145,6 @@ export class OrderService {
     this.logger.log(`Updating order ${orderId} status to ${status}`);
 
     await this.orderRepo.update(orderId, { status });
-
-    // Suspense error, transaction will roll back
-    throw new InternalServerErrorException();
   }
 
   /**

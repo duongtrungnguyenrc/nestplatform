@@ -5,6 +5,7 @@ import { IFeatureExplorer, FeatureExplorer, MethodContext, ProviderContext } fro
 import { TransactionalFeatureDecoration } from "./transactional-feature.decoration";
 import { TransactionalMetadataAccessor } from "./transactional-metadata.accessor";
 import { TransactionalOptions } from "./types";
+import { TransactionalEventPublisher } from "./transactional-event.publisher";
 
 @Injectable()
 @FeatureExplorer()
@@ -19,6 +20,7 @@ export class TransactionalMetadataExplorer implements IFeatureExplorer {
   constructor(
     private readonly metadataAccessor: TransactionalMetadataAccessor,
     private readonly featureDecoration: TransactionalFeatureDecoration,
+    private readonly eventPublisher: TransactionalEventPublisher,
   ) {}
 
   /**
@@ -35,13 +37,22 @@ export class TransactionalMetadataExplorer implements IFeatureExplorer {
   }
 
   /**
-   * Scan each method for @Transactional()/@NoTransactional() metadata.
+   * Scan each method for @Transactional()/@NoTransactional() or @TransactionalEventListener() metadata.
    * Class-level options serve as defaults; method-level options override them.
    */
   onMethod(ctx: MethodContext): void {
     const { instance, methodName, methodRef, metatype } = ctx;
 
-    // Check if method is explicitly excluded
+    // Check for transactional event listener
+    const listenerMetadata = this.metadataAccessor.getEventListenerMetadata(methodRef);
+    if (listenerMetadata) {
+      this.eventPublisher.registerListener({
+        ...listenerMetadata,
+        callback: (payload: any) => methodRef.apply(instance, [payload]),
+      });
+    }
+
+    // Check if method is explicitly excluded from transaction management
     const isExcluded: boolean | undefined = this.metadataAccessor.getNoTransactionalMetadata(methodRef);
 
     if (isExcluded) return;
@@ -55,8 +66,34 @@ export class TransactionalMetadataExplorer implements IFeatureExplorer {
     // Merge: method-level overrides class-level
     const resolvedOptions: TransactionalOptions | undefined = methodOptions ? { ...classOptions, ...methodOptions } : classOptions;
 
-    if (!resolvedOptions) return;
+    // Check for declarative event publishing (@TransactionalEvent)
+    const eventMetadata = this.metadataAccessor.getTransactionalEventMetadata(methodRef);
 
-    this.featureDecoration.wrapMethodWithTransaction(instance, methodName, methodRef, resolvedOptions);
+    if (eventMetadata) {
+      const eventPublisher = this.eventPublisher;
+      const originalMethod = methodRef;
+
+      /**
+       * Inner wrapper that publishes an event after successful execution.
+       * If called within a transaction, publishing is deferred.
+       */
+      const wrappedWithEvent = async function (...args: any[]) {
+        const result = await originalMethod.apply(this, args);
+        const payload = eventMetadata.payload ? eventMetadata.payload(result) : result;
+        await eventPublisher.publish(eventMetadata.event, payload);
+        return result;
+      };
+
+      if (resolvedOptions) {
+        // Case: Both @Transactional and @TransactionalEvent are present
+        this.featureDecoration.wrapMethodWithTransaction(instance, methodName, wrappedWithEvent, resolvedOptions);
+      } else {
+        // Case: ONLY @TransactionalEvent is present
+        instance[methodName] = wrappedWithEvent;
+      }
+    } else if (resolvedOptions) {
+      // Case: ONLY @Transactional is present
+      this.featureDecoration.wrapMethodWithTransaction(instance, methodName, methodRef, resolvedOptions);
+    }
   }
 }

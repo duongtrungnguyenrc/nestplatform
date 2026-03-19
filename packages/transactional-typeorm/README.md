@@ -57,6 +57,19 @@ The adapter creates a `SAVEPOINT` within the current transaction. If the nested 
 
 The `TypeOrmTransactionAdapter` uses a **Proxy Pattern** on your service instances to intercept calls to TypeORM repositories. When a transaction is active, the adapter ensures that repositories use the `QueryRunner.manager` from the current transaction context instead of the global `EntityManager`.
 
+## Changelog
+
+### 1.1.0
+- Added support for transaction synchronization hooks (`beforeCommit`, `afterCommit`, `afterRollback`, `afterCompletion`).
+- Improved `shouldRollback` logic to support error names (strings) and single class instances.
+- Integrated `invokeBeforeCommit` before physical commit for all propagation levels.
+
+### 1.0.1
+- Fixed TypeORM peer dependency support for NestJS 11.
+
+### 1.0.0
+- Initial release with `TypeOrmTransactionAdapter` and basic propagation support.
+
 ## License
 
 MIT

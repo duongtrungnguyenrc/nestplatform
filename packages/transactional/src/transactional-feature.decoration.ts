@@ -45,6 +45,7 @@ export class TransactionalFeatureDecoration extends FeatureDecoration {
         const result = await adapter.execute(() => originalMethod.apply(proxiedInstance || instance, args), {
           propagation: options.propagation || TransactionPropagation.REQUIRED,
           isolation: options.isolation,
+          rollbackOnError: options.rollbackOnError,
         });
 
         if (options.logging) {
