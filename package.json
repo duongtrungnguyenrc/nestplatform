@@ -22,7 +22,7 @@
     "nestjsplatform"
   ],
   "author": "Đường Trung Nguyên",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "workspaces": [
     "packages/*",
