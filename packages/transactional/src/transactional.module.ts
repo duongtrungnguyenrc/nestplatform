@@ -9,6 +9,22 @@ import { TransactionalFeatureDecoration } from "./transactional-feature.decorati
 import { TransactionalMetadataAccessor } from "./transactional-metadata.accessor";
 import { TransactionalEventPublisher } from "./transactional-event.publisher";
 
+/**
+ * Module that provides declarative transaction management.
+ *
+ * This module explores classes and methods decorated with `@Transactional`
+ * and wraps them with transaction logic provided by specific adapters
+ * (e.g. TypeORM, Mongoose).
+ *
+ * @example
+ * ```typescript
+ * TransactionalModule.register({
+ *   adapters: {
+ *     default: new TypeOrmTransactionAdapter(dataSource),
+ *   },
+ * })
+ * ```
+ */
 @Module({})
 export class TransactionalModule extends ConfigurableModule {
   static register(config: TransactionalModuleConfigSync): DynamicModule {

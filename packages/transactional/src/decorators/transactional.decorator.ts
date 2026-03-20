@@ -1,46 +1,35 @@
-import { applyDecorators, SetMetadata } from "@nestjs/common";
+import { SetMetadata } from "@nestjs/common";
 
 import { NO_TRANSACTIONAL_METADATA, TRANSACTIONAL_METADATA } from "../transactional.constant";
-import { TransactionalOptions, TransactionPropagation } from "../types";
-
-const TRANSACTIONAL_DEFAULTS: Required<Omit<TransactionalOptions, "adapter" | "isolation">> = {
-  propagation: TransactionPropagation.REQUIRED,
-  logging: false,
-  rollbackOnError: true,
-};
+import { TransactionalOptions } from "../types";
 
 /**
- * Marks a class or method as transactional.
+ * Decorator that marks a class or method to be executed within a transaction.
  *
- * - **Method-level**: Wraps the decorated method in a database transaction.
- * - **Class-level**: Wraps all methods of the class in transactions.
- *   Use `@NoTransactional()` on specific methods to opt-out.
+ * When applied to a class, all methods within that class will be transactional.
+ * When applied to a method, it overrides class-level transactional settings.
+ *
+ * @param options - Transactional options including propagation, isolation, and rollback behavior.
  *
  * @example
  * // Method-level
  * @Transactional()
  * async createOrder(dto: CreateOrderDto) { ... }
  *
- * // Method-level with options
- * @Transactional({ propagation: TransactionPropagation.REQUIRES_NEW })
- * async logAuditEvent(event: AuditEvent) { ... }
- *
  * // Class-level
  * @Transactional()
  * @Injectable()
  * export class PaymentService { ... }
  */
-export const Transactional = (options?: TransactionalOptions): ClassDecorator & MethodDecorator => {
-  const mergedOptions: TransactionalOptions = {
-    ...TRANSACTIONAL_DEFAULTS,
-    ...options,
+export function Transactional(options?: TransactionalOptions): MethodDecorator & ClassDecorator {
+  return (target: any, key?: string | symbol, descriptor?: TypedPropertyDescriptor<any>) => {
+    SetMetadata(TRANSACTIONAL_METADATA, options || {})(target, key!, descriptor!);
   };
-
-  return applyDecorators(SetMetadata(TRANSACTIONAL_METADATA, mergedOptions));
-};
+}
 
 /**
- * Excludes a method from class-level `@Transactional()` wrapping.
+ * Decorator that explicitly marks a method to be excluded from transaction management,
+ * even if the class is decorated with `@Transactional`.
  *
  * @example
  * @Transactional()
@@ -50,6 +39,6 @@ export const Transactional = (options?: TransactionalOptions): ClassDecorator & 
  *     async getPaymentStatus(id: string) { ... } // Not wrapped in transaction
  * }
  */
-export const NoTransactional = (): MethodDecorator => {
-  return applyDecorators(SetMetadata(NO_TRANSACTIONAL_METADATA, true));
-};
+export function NoTransactional(): MethodDecorator {
+  return SetMetadata(NO_TRANSACTIONAL_METADATA, true);
+}

@@ -1,4 +1,4 @@
-import { applyDecorators, SetMetadata } from "@nestjs/common";
+import { SetMetadata } from "@nestjs/common";
 import { TRANSACTIONAL_EVENT_METADATA } from "../transactional.constant";
 import { TransactionalEventOptions } from "../types";
 
@@ -15,17 +15,14 @@ import { TransactionalEventOptions } from "../types";
  * @example
  * ```typescript
  * @Transactional()
- * @TransactionalEvent('order.created')
- * async createOrder(data: any) {
- *   return this.orderRepo.save(data); // The saved order is the event payload
- * }
- * ```
+ * Decorator that marks a method to publish an event upon successful completion.
+ *
+ * If the method is running within a transaction, the event publication is
+ * deferred until the transaction is successfully committed.
+ *
+ * @param event - The name of the event to publish.
+ * @param options - Optional event configuration, including a payload builder.
  */
-export const TransactionalEvent = (event: string, options?: TransactionalEventOptions): MethodDecorator => {
-  return applyDecorators(
-    SetMetadata(TRANSACTIONAL_EVENT_METADATA, {
-      event,
-      ...options,
-    }),
-  );
-};
+export function TransactionalEvent(event: string, options?: TransactionalEventOptions): MethodDecorator {
+  return SetMetadata(TRANSACTIONAL_EVENT_METADATA, { ...options, event });
+}
