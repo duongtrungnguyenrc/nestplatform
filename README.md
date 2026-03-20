@@ -8,6 +8,7 @@ This monorepo contains a collection of NestJS support libraries focused on high-
 |---------|-------------|---------------|
 | `@nestplatform/transactional` | ORM-agnostic transactional management module for NestJS. | [README](packages/transactional/README.md) |
 | `@nestplatform/transactional-typeorm` | TypeORM adapter for `@nestplatform/transactional`. | [README](packages/transactional-typeorm/README.md) |
+| `@nestplatform/transactional-mongoose` | Mongoose adapter for `@nestplatform/transactional`. | [README](packages/transactional-mongoose/README.md) |
 | `@nestplatform/common` | Shared utilities, decorators, and base modules. | [README](packages/common/README.md) |
 
 ## Monorepo Management
@@ -24,7 +25,7 @@ This project uses **Lerna** and **npm workspaces**.
 Install all dependencies:
 
 ```bash
-npm install --legacy-peer-deps
+npm install
 ```
 
 Build all packages:

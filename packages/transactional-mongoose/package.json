@@ -1,0 +1,28 @@
+{
+  "name": "@nestplatform/transactional-mongoose",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@nestplatform/common": "^1.0.1"
+  },
+  "peerDependencies": {
+    "@nestplatform/transactional": "^1.1.0",
+    "@nestjs/common": "^10.0.0 || ^11.0.0",
+    "@nestjs/core": "^10.0.0 || ^11.0.0",
+    "@nestjs/mongoose": "^10.0.0 || ^11.0.0",
+    "mongoose": "^7.0.0 || ^8.0.0"
+  },
+  "keywords": [
+    "transactional",
+    "mongoose"
+  ],
+  "author": "Đường Trung Nguyên",
+  "license": "MIT",
+  "type": "commonjs"
+}
