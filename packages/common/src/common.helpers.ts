@@ -64,3 +64,25 @@ export const stringifyMethod = (methodName: string, ...args: any[]) => {
     .map((arg) => (arg.length > 10 ? arg.substring(0, 9) + "..." : arg))
     .join(", ")})`;
 };
+
+export function mergeWithDefaults<T extends PlainObject = any, O = T>(defaults: T, overrides?: Partial<T>): O {
+  if (!overrides) return { ...defaults } as unknown as O;
+
+  const result: PlainObject = { ...defaults };
+
+  for (const key of Object.keys(overrides)) {
+    const overrideValue: T[string] | undefined = overrides[key];
+
+    if (overrideValue === undefined) continue;
+
+    const defaultValue: any = defaults[key];
+
+    if (isPlainObject(defaultValue) && isPlainObject(overrideValue)) {
+      result[key] = mergeWithDefaults(defaultValue, overrideValue);
+    } else {
+      result[key] = overrideValue;
+    }
+  }
+
+  return result as O;
+}

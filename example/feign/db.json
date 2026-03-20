@@ -1,0 +1,50 @@
+{
+  "users": [
+    {
+      "id": 2,
+      "name": "Bob Smith",
+      "email": "bob@example.com",
+      "role": "user"
+    },
+    {
+      "id": 3,
+      "name": "Charlie Brown",
+      "email": "charlie@example.com",
+      "role": "user"
+    },
+    {
+      "name": "Test User",
+      "email": "test@example.com",
+      "role": "user",
+      "id": 4
+    },
+    {
+      "name": "Test User",
+      "email": "test@example.com",
+      "role": "user",
+      "id": 5
+    }
+  ],
+  "posts": [
+    {
+      "id": 3,
+      "title": "TypeScript Best Practices",
+      "body": "TypeScript adds static types to JavaScript...",
+      "userId": 2
+    },
+    {
+      "title": "New Post",
+      "body": "This is a new post",
+      "userId": 2,
+      "id": 4
+    }
+  ],
+  "comments": [
+    {
+      "body": "Great post!",
+      "postId": 2,
+      "userId": 2,
+      "id": 1
+    }
+  ]
+}

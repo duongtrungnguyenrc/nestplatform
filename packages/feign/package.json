@@ -1,0 +1,26 @@
+{
+  "name": "@nestplatform/feign",
+  "version": "1.0.0",
+  "description": "Nestjs Open Feign library",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@nestplatform/common": "^1.0.1"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^10.0.0 || ^11.0.0",
+    "@nestjs/core": "^10.0.0 || ^11.0.0"
+  },
+  "keywords": [
+    "nestjs",
+    "rest-client",
+    "open-feign"
+  ],
+  "author": "Đường Trung Nguyên",
+  "license": "MIT",
+  "type": "commonjs"
+}
