@@ -14,3 +14,5 @@ export type ModuleConfigAsync<T> = {
 };
 
 export type PlainObject = Record<string, any>;
+
+export type WithRequired<T, K extends keyof T> = T & Required<Pick<T, K>>;
