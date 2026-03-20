@@ -8,6 +8,15 @@ import { TransactionalOptions, TransactionAdapters, TransactionPropagation } fro
 
 const LOGGING_CONTEXT = "TransactionalModule";
 
+/**
+ * Core service that implements the transaction management logic for all transactional decorators.
+ *
+ * This service is responsible for wrapping methods with transaction logic
+ * based on the decorator metadata (`@Transactional`, `@NoTransactional`).
+ * It delegates the actual transaction execution to the registered `ITransactionAdapter`.
+ *
+ * @internal This class is used internally by the `TransactionalMetadataExplorer`.
+ */
 @Injectable()
 export class TransactionalFeatureDecoration extends FeatureDecoration {
   constructor(@Inject(TRANSACTION_ADAPTERS) private readonly adapters: TransactionAdapters) {

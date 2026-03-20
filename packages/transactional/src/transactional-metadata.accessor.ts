@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Type } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 
 import { MetadataAccessor } from "@nestplatform/common";
@@ -11,6 +11,11 @@ import {
 } from "./transactional.constant";
 import { TransactionalOptions, TransactionalEventOptions } from "./types";
 
+/**
+ * Service that reads transactional metadata from decorated classes and methods.
+ *
+ * @internal This class is used internally by the `TransactionalMetadataExplorer`.
+ */
 @Injectable()
 export class TransactionalMetadataAccessor extends MetadataAccessor {
   constructor(protected readonly reflector: Reflector) {
@@ -18,34 +23,52 @@ export class TransactionalMetadataAccessor extends MetadataAccessor {
   }
 
   /**
-   * Get @Transactional() metadata from a class or method.
+   * Returns @Transactional() metadata from a class or method.
+   *
+   * @param target The target class or method
+   * @returns TransactionalOptions or undefined
    */
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  public getTransactionalMetadata(target: Function): TransactionalOptions | undefined {
-    return this.getMetadata<TransactionalOptions>(TRANSACTIONAL_METADATA, target);
+  public getTransactionalMetadata(target: Function | Type<any>): TransactionalOptions | undefined {
+    return this.reflector.get(TRANSACTIONAL_METADATA, target);
   }
 
   /**
-   * Get @NoTransactional() metadata from a method.
+   * Returns @NoTransactional() metadata from a method.
+   *
+   * @param target The target method
+   * @returns boolean or undefined
    */
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  public getNoTransactionalMetadata(target: Function): boolean | undefined {
-    return this.getMetadata<boolean>(NO_TRANSACTIONAL_METADATA, target);
+  public getNoTransactionalMetadata(target: Function | Type<any>): boolean | undefined {
+    return this.reflector.get(NO_TRANSACTIONAL_METADATA, target);
   }
 
   /**
-   * Get @TransactionalEventListener() metadata from a method.
+   * Returns @TransactionalEventListener() metadata from a method.
+   *
+   * @param target The target method
+   * @returns TransactionalEventOptions or undefined
    */
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  public getEventListenerMetadata(target: Function): any | undefined {
-    return this.getMetadata<any>(TRANSACTIONAL_EVENT_LISTENER_METADATA, target);
+  public getEventListenerMetadata(target: Function | Type<any>): any | undefined {
+    return this.reflector.get(TRANSACTIONAL_EVENT_LISTENER_METADATA, target);
   }
 
   /**
-   * Get @TransactionalEvent() metadata from a method.
+   * Returns @TransactionalEvent() metadata from a method.
+   *
+   * @param target The target method
+   * @returns TransactionalEventOptions & { event: string } or undefined
    */
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  public getTransactionalEventMetadata(target: Function): (TransactionalEventOptions & { event: string }) | undefined {
-    return this.getMetadata<TransactionalEventOptions & { event: string }>(TRANSACTIONAL_EVENT_METADATA, target);
+  public getTransactionalEventMetadata(target: Function | Type<any>): (TransactionalEventOptions & { event: string }) | undefined {
+    return this.reflector.get(TRANSACTIONAL_EVENT_METADATA, target);
+  }
+
+  /**
+   * Checks if the target has transactional metadata.
+   *
+   * @param target The target class or method
+   * @returns boolean
+   */
+  public isTransactional(target: Function | Type<any>): boolean {
+    return !!this.getTransactionalMetadata(target);
   }
 }

@@ -77,7 +77,7 @@ export class TransactionalMetadataExplorer implements IFeatureExplorer {
        * Inner wrapper that publishes an event after successful execution.
        * If called within a transaction, publishing is deferred.
        */
-      const wrappedWithEvent = async function (...args: any[]) {
+      const wrappedWithEvent = async function (this: any, ...args: any[]) {
         const result = await originalMethod.apply(this, args);
         const payload = eventMetadata.payload ? eventMetadata.payload(result) : result;
         await eventPublisher.publish(eventMetadata.event, payload);
@@ -89,7 +89,7 @@ export class TransactionalMetadataExplorer implements IFeatureExplorer {
         this.featureDecoration.wrapMethodWithTransaction(instance, methodName, wrappedWithEvent, resolvedOptions);
       } else {
         // Case: ONLY @TransactionalEvent is present
-        instance[methodName] = wrappedWithEvent;
+        instance[methodName] = wrappedWithEvent.bind(instance);
       }
     } else if (resolvedOptions) {
       // Case: ONLY @Transactional is present

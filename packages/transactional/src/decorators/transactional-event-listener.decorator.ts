@@ -1,4 +1,4 @@
-import { applyDecorators, SetMetadata } from "@nestjs/common";
+import { SetMetadata } from "@nestjs/common";
 import { TRANSACTIONAL_EVENT_LISTENER_METADATA } from "../transactional.constant";
 import { TransactionalEventListenerOptions } from "../types";
 
@@ -11,22 +11,9 @@ import { TransactionalEventListenerOptions } from "../types";
  * - AFTER_COMPLETION: Runs after the transaction completes (either committed or rolled back).
  * - BEFORE_COMMIT: Runs before the transaction commits.
  *
- * @param event - The event name to listen for
- * @param options - Additional options (phase, fallbackExecution)
- *
- * @example
- * ```typescript
- * @TransactionalEventListener('order.created', { phase: TransactionPhase.AFTER_COMMIT })
- * async onOrderCreated(event: OrderCreatedEvent) {
- *   // Sends email only if transaction committed
- * }
- * ```
+ * @param event - The name of the event to listen for.
+ * @param options - Listener options including the transaction phase.
  */
-export const TransactionalEventListener = (event: string, options?: TransactionalEventListenerOptions): MethodDecorator => {
-  return applyDecorators(
-    SetMetadata(TRANSACTIONAL_EVENT_LISTENER_METADATA, {
-      event,
-      ...options,
-    }),
-  );
-};
+export function TransactionalEventListener(event: string, options?: TransactionalEventListenerOptions): MethodDecorator {
+  return SetMetadata(TRANSACTIONAL_EVENT_LISTENER_METADATA, { ...options, event });
+}

@@ -37,6 +37,9 @@ const LOGGING_CONTEXT = "MongooseTransactionAdapter";
  * ```
  */
 export class MongooseTransactionAdapter implements ITransactionAdapter {
+  /**
+   * @internal
+   */
   constructor(private readonly connection: Connection) {}
 
   async execute<T>(callback: () => Promise<T>, options: TransactionExecuteOptions): Promise<T> {
