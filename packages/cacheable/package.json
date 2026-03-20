@@ -1,0 +1,35 @@
+{
+  "name": "@nestplatform/cacheable",
+  "version": "1.0.0",
+  "description": "Nestjs Cacheable library - Spring-like declarative caching decorators for NestJS",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@nestplatform/common": "^1.0.1"
+  },
+  "peerDependencies": {
+    "@nestjs/cache-manager": "^2.0.0 || ^3.0.0",
+    "@nestjs/common": "^10.0.0 || ^11.0.0",
+    "@nestjs/core": "^10.0.0 || ^11.0.0",
+    "cache-manager": "^5.0.0 || ^6.0.0 || ^7.0.0",
+    "ms": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/ms": "^2.1.0"
+  },
+  "keywords": [
+    "nestjs",
+    "cacheable",
+    "cache",
+    "cache-manager",
+    "decorator",
+    "spring-cache"
+  ],
+  "author": "Đường Trung Nguyên",
+  "license": "MIT",
+  "type": "commonjs"
+}

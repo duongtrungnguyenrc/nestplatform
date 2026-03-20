@@ -10,6 +10,7 @@ This monorepo contains a collection of NestJS support libraries focused on high-
 | `@nestplatform/transactional-typeorm` | TypeORM adapter for `@nestplatform/transactional`. | [README](packages/transactional-typeorm/README.md) |
 | `@nestplatform/transactional-mongoose` | Mongoose adapter for `@nestplatform/transactional`. | [README](packages/transactional-mongoose/README.md) |
 | `@nestplatform/feign` | Declarative HTTP client library for NestJS inspired by Spring Cloud OpenFeign. | [README](packages/feign/README.md) |
+| `@nestplatform/cacheable` | Spring-like declarative caching decorators for NestJS based on `cache-manager`. | [README](packages/cacheable/README.md) |
 | `@nestplatform/common` | Shared utilities, decorators, and base modules. | [README](packages/common/README.md) |
 
 ## Monorepo Management
@@ -35,15 +36,21 @@ Build all packages:
 npm run build
 ```
 
-## Example Project
+## Example Projects
 
-There is a placeholder NestJS project in the `example/basic` directory to demonstrate the usage of these libraries.
+There are several example NestJS projects to demonstrate the usage of these libraries:
 
-To run the example:
+1. **`example/transactional-typeorm`**: Demonstrates @Transactional with TypeORM.
+2. **`example/transactional-mongoose`**: Demonstrates @Transactional with Mongoose.
+3. **`example/cacheable`**: Demonstrates declarative caching with @Cacheable, @CachePut, and @CacheEvict.
+4. **`example/feign`**: Demonstrates declarative HTTP clients.
+5. **`example/rest-client`**: Demonstrates advanced REST client configuration.
+
+To run an example:
 
 1. Build the monorepo: `npm run build`
-2. Configure your environment in `example/basic/.env` (Database credentials)
-3. Start the example: `cd example/basic && npm run start:dev`
+2. Configure your environment in the example's directory if needed (e.g. `.env`)
+3. Start the example: `cd example/<name> && npm run start:dev`
 
 ## License
 
