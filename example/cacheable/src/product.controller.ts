@@ -15,6 +15,11 @@ export class ProductController {
     return this.productService.getProduct(id);
   }
 
+  @Post("clear-cache")
+  async clearCache(): Promise<void> {
+    return this.productService.clearAllProductsCache();
+  }
+
   @Post(":id")
   async update(@Param("id") id: string, @Body() body: { name: string; price: number }): Promise<Product> {
     return this.productService.updateProduct(id, body.name, body.price);
@@ -23,10 +28,5 @@ export class ProductController {
   @Delete(":id")
   async remove(@Param("id") id: string): Promise<void> {
     return this.productService.deleteProduct(id);
-  }
-
-  @Post("clear-cache")
-  async clearCache(): Promise<void> {
-    return this.productService.clearAllProductsCache();
   }
 }

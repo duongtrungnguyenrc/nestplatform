@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Type } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import Ms from "ms";
 
@@ -30,12 +30,13 @@ export class CacheableMetadataAccessor extends MetadataAccessor {
   }
 
   /**
-   * Gets the custom cache key builder from method metadata.
-   * @param target - The method reference to inspect.
-   * @returns The key builder, or `undefined` if not set.
+   * Returns cache key metadata from the target method.
+   *
+   * @param target The target method
+   * @returns KeyBuilder or string or undefined
    */
-  public getCacheKeyMetadata(target: Function): KeyBuilder<string> | undefined {
-    return this.getMetadata<KeyBuilder<string>>(CACHE_KEY_METADATA, target);
+  getCacheKeyMetadata(target: Function | Type<any>): KeyBuilder<any> | string | undefined {
+    return this.reflector.get(CACHE_KEY_METADATA, target);
   }
 
   /**
@@ -43,8 +44,8 @@ export class CacheableMetadataAccessor extends MetadataAccessor {
    * @param target - The method reference to inspect.
    * @returns The namespace string, or `undefined` if not set.
    */
-  public getNamespaceMetadata(target: Function): string | undefined {
-    return this.getMetadata<string>(CACHE_NAMESPACE_METADATA, target);
+  public getNamespaceMetadata(target: Function | Type<any>): string | undefined {
+    return this.reflector.get<string>(CACHE_NAMESPACE_METADATA, target);
   }
 
   /**
@@ -52,35 +53,68 @@ export class CacheableMetadataAccessor extends MetadataAccessor {
    * @param target - The method reference to inspect.
    * @returns The TTL as a human-readable string (e.g. `'30s'`), or `undefined` if not set.
    */
-  public getTtlMetadata(target: Function): Ms.StringValue | undefined {
-    return this.getMetadata<Ms.StringValue>(CACHE_TTL_METADATA, target);
+  public getTtlMetadata(target: Function | Type<any>): Ms.StringValue | undefined {
+    return this.reflector.get<Ms.StringValue>(CACHE_TTL_METADATA, target);
   }
 
   /**
-   * Checks whether the method is decorated with `@Cacheable`.
-   * @param target - The method reference to inspect.
-   * @returns `true` if the method is cacheable, `undefined` otherwise.
+   * Returns cacheable metadata from the target method.
+   *
+   * @param target The target method
+   * @returns CacheableOptions or undefined
    */
-  public getCacheableMetadata(target: Function): boolean | undefined {
-    return this.getMetadata<boolean>(CACHEABLE_METADATA, target);
+  public getCacheableMetadata(target: Function | Type<any>): CacheableOptions | undefined {
+    return this.reflector.get(CACHEABLE_METADATA, target);
   }
 
   /**
-   * Gets the eviction key builder from a `@CacheEvict`-decorated method.
-   * @param target - The method reference to inspect.
-   * @returns The eviction key builder, or `undefined` if not set.
+   * Checks if the target method has cacheable metadata.
+   *
+   * @param target The target method
+   * @returns boolean
    */
-  public getCacheEvictMetadata(target: Function): KeyBuilder<string | string[]> | undefined {
-    return this.getMetadata<KeyBuilder<string | string[]>>(CACHE_EVICT_METADATA, target);
+  public isCacheable(target: Function | Type<any>): boolean {
+    return !!this.getCacheableMetadata(target);
   }
 
   /**
-   * Checks whether the method is decorated with `@CachePut`.
-   * @param target - The method reference to inspect.
-   * @returns `true` if the method has cache-put behavior, `undefined` otherwise.
+   * Returns cache evict metadata from the target method.
+   *
+   * @param target The target method
+   * @returns CacheEvictOptions or undefined
    */
-  public getCachePutMetadata(target: Function): boolean | undefined {
-    return this.getMetadata<boolean>(CACHE_PUT_METADATA, target);
+  public getCacheEvictMetadata(target: Function | Type<any>): CacheEvictOptions | undefined {
+    return this.reflector.get(CACHE_EVICT_METADATA, target);
+  }
+
+  /**
+   * Checks if the target method has cache evict metadata.
+   *
+   * @param target The target method
+   * @returns boolean
+   */
+  public isCacheEvict(target: Function | Type<any>): boolean {
+    return !!this.getCacheEvictMetadata(target);
+  }
+
+  /**
+   * Returns cache put metadata from the target method.
+   *
+   * @param target The target method
+   * @returns CachePutOptions or undefined
+   */
+  public getCachePutMetadata(target: Function | Type<any>): CachePutOptions | undefined {
+    return this.reflector.get(CACHE_PUT_METADATA, target);
+  }
+
+  /**
+   * Checks if the target method has cache put metadata.
+   *
+   * @param target The target method
+   * @returns boolean
+   */
+  public isCachePut(target: Function | Type<any>): boolean {
+    return !!this.getCachePutMetadata(target);
   }
 
   /**
@@ -88,10 +122,8 @@ export class CacheableMetadataAccessor extends MetadataAccessor {
    * @param target - The method reference to inspect.
    * @returns The assembled options, or `undefined` if the method is not `@Cacheable`.
    */
-  public getAllCacheableMetadata(target: Function): CacheableOptions | undefined {
-    const cacheableMetadata: boolean | undefined = this.getCacheableMetadata(target);
-
-    if (!cacheableMetadata) return undefined;
+  public getAllCacheableMetadata(target: Function | Type<any>): CacheableOptions | undefined {
+    if (!this.isCacheable(target)) return undefined;
 
     return {
       namespace: this.getNamespaceMetadata(target),
@@ -105,10 +137,8 @@ export class CacheableMetadataAccessor extends MetadataAccessor {
    * @param target - The method reference to inspect.
    * @returns The assembled options, or `undefined` if the method is not `@CachePut`.
    */
-  public getAllCachePutMetadata(target: Function): CachePutOptions | undefined {
-    const cachePutMetadata: boolean | undefined = this.getCachePutMetadata(target);
-
-    if (!cachePutMetadata) return undefined;
+  public getAllCachePutMetadata(target: Function | Type<any>): CachePutOptions | undefined {
+    if (!this.isCachePut(target)) return undefined;
 
     return {
       namespace: this.getNamespaceMetadata(target),
@@ -122,14 +152,15 @@ export class CacheableMetadataAccessor extends MetadataAccessor {
    * @param target - The method reference to inspect.
    * @returns The assembled options, or `undefined` if the method is not `@CacheEvict`.
    */
-  public getAllCacheEvictMetadata(target: Function): CacheEvictOptions | undefined {
-    const cacheEvictMetadata: KeyBuilder<string | string[]> | undefined = this.getCacheEvictMetadata(target);
+  public getAllCacheEvictMetadata(target: Function | Type<any>): CacheEvictOptions | undefined {
+    const options = this.getCacheEvictMetadata(target);
 
-    if (!cacheEvictMetadata) return undefined;
+    if (!options) return undefined;
 
     return {
-      namespace: this.getNamespaceMetadata(target),
-      key: cacheEvictMetadata,
+      ...options,
+      namespace: options.namespace || this.getNamespaceMetadata(target),
+      key: options.key || (this.getCacheKeyMetadata(target) as any),
     };
   }
 }

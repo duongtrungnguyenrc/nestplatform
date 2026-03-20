@@ -59,6 +59,8 @@ export class ProductService {
   })
   async getAllProducts(): Promise<Product[]> {
     this.logger.log("Fetching all products from database...");
+    // Simulate database delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
     return this.products;
   }
 
