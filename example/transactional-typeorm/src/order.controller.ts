@@ -21,6 +21,18 @@ export class OrderController {
     );
   }
 
+  @Post('audit')
+  async createAuditLog(@Body() body: { orderId: string; action: string }) {
+    return this.orderService.createAuditLog(body.orderId, body.action);
+  }
+
+  @Post('adjust')
+  async adjustOrderAmount(
+    @Body() body: { orderId: string; adjustment: number },
+  ) {
+    return this.orderService.adjustOrderAmount(body.orderId, body.adjustment);
+  }
+
   @Post('create-declarative')
   async createOrderDeclarative(
     @Body() body: { productName: string; amount: number },
@@ -34,6 +46,16 @@ export class OrderController {
   @Post('test-rollback')
   async testRollback() {
     return this.orderService.processWithConditionalRollback();
+  }
+
+  @Post('test-explicit-rollback')
+  async testExplicitRollback(
+    @Body() body: { productName: string; amount: number },
+  ) {
+    return this.orderService.createOrderWithRollback(
+      body.productName,
+      body.amount,
+    );
   }
 
   @Get()

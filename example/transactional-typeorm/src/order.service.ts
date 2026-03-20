@@ -61,6 +61,26 @@ export class OrderService {
   }
 
   /**
+   * Test scenario: Explicit Rollback.
+   */
+  async createOrderWithRollback(
+    productName: string,
+    amount: number,
+  ): Promise<Order> {
+    this.logger.log(`Creating order (will rollback) for ${productName}`);
+
+    const order = this.orderRepo.create({
+      productName,
+      amount,
+      status: 'should_rollback',
+    });
+
+    await this.orderRepo.save(order);
+
+    throw new Error('Forced rollback for testing');
+  }
+
+  /**
    * Create an order and publish an event declaratively using @TransactionalEvent.
    */
   @TransactionalEvent('order.created')
