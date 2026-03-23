@@ -59,6 +59,9 @@ The `TypeOrmTransactionAdapter` uses a **Proxy Pattern** on your service instanc
 
 ## Changelog
 
+### 1.1.1
+- adjust to allow multi layers transactional (hexagonal, clean architecture)
+
 ### 1.1.0
 - Added support for transaction synchronization hooks (`beforeCommit`, `afterCommit`, `afterRollback`, `afterCompletion`).
 - Improved `shouldRollback` logic to support error names (strings) and single class instances.

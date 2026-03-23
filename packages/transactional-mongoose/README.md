@@ -56,3 +56,12 @@ export class OrderService {
 
 - MongoDB replica set or sharded cluster (required for transactions).
 - NestJS with `@nestjs/mongoose`.
+
+## Changelog
+
+### 1.1.1
+- adjust to allow multi layers transactional (hexagonal, clean architecture)
+
+### 1.0.0
+- release first version supporting for mongoose
+
