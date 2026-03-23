@@ -37,6 +37,8 @@ const LOGGING_CONTEXT = "MongooseTransactionAdapter";
  * ```
  */
 export class MongooseTransactionAdapter implements ITransactionAdapter {
+  private readonly proxyCache = new WeakMap<object, any>();
+
   /**
    * @internal
    */
@@ -146,6 +148,36 @@ export class MongooseTransactionAdapter implements ITransactionAdapter {
               return modelValue;
             },
           });
+        }
+
+        if (typeof value === "object") {
+          // Skip built-in objects to avoid issues
+          if (
+            value instanceof Promise ||
+            value instanceof Date ||
+            Array.isArray(value) ||
+            value instanceof RegExp ||
+            value instanceof Map ||
+            value instanceof Set ||
+            value instanceof WeakMap ||
+            value instanceof WeakSet
+          ) {
+            return value;
+          }
+
+          // We must be careful not to proxy Mongoose's internal Connection/ClientSession
+          if (typeof value.startSession === "function" || typeof value.inTransaction === "function") {
+            return value;
+          }
+
+          // Use WeakMap to store created proxies
+          if (this.proxyCache.has(value)) {
+            return this.proxyCache.get(value);
+          }
+
+          const proxied = this.proxyInstance(value);
+          this.proxyCache.set(value, proxied);
+          return proxied;
         }
 
         // Ensure method binding is preserved for regular methods

@@ -30,6 +30,8 @@ import { DataSource, QueryRunner } from "typeorm";
  * ```
  */
 export class TypeOrmTransactionAdapter implements ITransactionAdapter {
+  private readonly proxyCache = new WeakMap<object, any>();
+
   constructor(private readonly dataSource: DataSource) {}
 
   async execute<T>(callback: () => Promise<T>, options: TransactionExecuteOptions): Promise<T> {
@@ -114,6 +116,8 @@ export class TypeOrmTransactionAdapter implements ITransactionAdapter {
       get: (target, prop, receiver) => {
         const value: any = Reflect.get(target, prop, receiver);
 
+        console.log("proxy instance:", instance);
+
         // Make sure this context always proxied
         if (typeof value === "function") {
           return function (...args: any[]) {
@@ -121,35 +125,69 @@ export class TypeOrmTransactionAdapter implements ITransactionAdapter {
           };
         }
 
-        /**
-         * Check if the value is a TypeORM repository by checking for the presence of metadata and manager properties.
-         */
-        const isRepo = value && typeof value === "object" && value.metadata && value.manager;
-
-        if (isRepo) {
-          // Get the transaction context
-          const queryRunner = TransactionContext.getTransaction<QueryRunner>();
-
-          if (!queryRunner || queryRunner.isReleased) {
+        if (value && typeof value === "object") {
+          // Skip built-in objects to avoid issues
+          if (
+            value instanceof Promise ||
+            value instanceof Date ||
+            Array.isArray(value) ||
+            value instanceof RegExp ||
+            value instanceof Map ||
+            value instanceof Set ||
+            value instanceof WeakMap ||
+            value instanceof WeakSet
+          ) {
             return value;
           }
 
-          const txManager = queryRunner.manager;
-          const txRepo = txManager.getRepository(value.metadata.target);
+          /**
+           * Check if the value is a TypeORM repository by checking for the presence of metadata and manager properties.
+           */
+          const isRepo = value.metadata && value.manager;
 
-          return new Proxy(txRepo, {
-            get(repoTarget, repoProp, repoReceiver) {
-              const repoValue = Reflect.get(repoTarget, repoProp, repoReceiver);
+          if (isRepo) {
+            // Get the transaction context
+            const queryRunner = TransactionContext.getTransaction<QueryRunner>();
 
-              if (typeof repoValue === "function") {
-                return function (...args: any[]) {
-                  return repoValue.apply(repoTarget, args);
-                };
-              }
+            if (!queryRunner || queryRunner.isReleased) {
+              return value;
+            }
 
-              return repoValue;
-            },
-          });
+            const txManager = queryRunner.manager;
+            const txRepo = txManager.getRepository(value.metadata.target);
+
+            return new Proxy(txRepo, {
+              get(repoTarget, repoProp, repoReceiver) {
+                const repoValue = Reflect.get(repoTarget, repoProp, repoReceiver);
+
+                if (typeof repoValue === "function") {
+                  return function (...args: any[]) {
+                    return repoValue.apply(repoTarget, args);
+                  };
+                }
+
+                return repoValue;
+              },
+            });
+          }
+
+          // Not a repo, maybe it's a nested service or object we want to proxy
+          // We must be careful not to proxy TypeORM's internal Connection/DataSource or QueryRunner
+          if (typeof value.query === "function" && typeof value.isReleased === "boolean") {
+            return value;
+          }
+          if (typeof value.createQueryRunner === "function") {
+            return value;
+          }
+
+          // Use WeakMap to store created proxies
+          if (this.proxyCache.has(value)) {
+            return this.proxyCache.get(value);
+          }
+
+          const proxied = this.proxyInstance(value);
+          this.proxyCache.set(value, proxied);
+          return proxied;
         }
 
         return value;
