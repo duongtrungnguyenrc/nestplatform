@@ -33,5 +33,14 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.7",
     "typescript": "^5.7.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duongtrungnguyenrc/nestplatform.git",
+    "directory": "example/cacheable"
+  },
+  "bugs": {
+    "url": "https://github.com/duongtrungnguyenrc/nestplatform/issues"
+  },
+  "homepage": "https://github.com/duongtrungnguyenrc/nestplatform#readme"
 }

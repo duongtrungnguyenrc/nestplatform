@@ -48,5 +48,14 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duongtrungnguyenrc/nestplatform.git",
+    "directory": "example/transactional-mongoose"
+  },
+  "bugs": {
+    "url": "https://github.com/duongtrungnguyenrc/nestplatform/issues"
+  },
+  "homepage": "https://github.com/duongtrungnguyenrc/nestplatform#readme"
 }

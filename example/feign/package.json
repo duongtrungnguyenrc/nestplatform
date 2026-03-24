@@ -28,5 +28,14 @@
     "json-server": "^0.17.4",
     "concurrently": "^9.1.2",
     "typescript": "^5.7.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duongtrungnguyenrc/nestplatform.git",
+    "directory": "example/feign"
+  },
+  "bugs": {
+    "url": "https://github.com/duongtrungnguyenrc/nestplatform/issues"
+  },
+  "homepage": "https://github.com/duongtrungnguyenrc/nestplatform#readme"
 }

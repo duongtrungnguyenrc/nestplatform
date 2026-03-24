@@ -72,5 +72,14 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duongtrungnguyenrc/nestplatform.git",
+    "directory": "example/transactional-typeorm"
+  },
+  "bugs": {
+    "url": "https://github.com/duongtrungnguyenrc/nestplatform/issues"
+  },
+  "homepage": "https://github.com/duongtrungnguyenrc/nestplatform#readme"
 }
