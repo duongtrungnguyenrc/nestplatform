@@ -49,5 +49,13 @@
     "rimraf": "^6.1.3",
     "rxjs": "^7.8.2",
     "typescript": "^5.9.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duongtrungnguyenrc/nestplatform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/duongtrungnguyenrc/nestplatform/issues"
+  },
+  "homepage": "https://github.com/duongtrungnguyenrc/nestplatform#readme"
 }
