@@ -1,6 +1,6 @@
 {
   "name": "@nestplatform/cacheable",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Nestjs Cacheable library - Spring-like declarative caching decorators for NestJS",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

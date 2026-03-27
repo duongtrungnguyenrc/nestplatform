@@ -132,6 +132,14 @@ Namespaces allow you to prefix your cache keys, useful for grouping related cach
 ```typescript
 @Cacheable({ namespace: 'v1', key: (id) => `user:${id}` }) // Result: v1:user:123
 ```
+## Changelog
+
+### 1.0.1
+- Resolve ms dependency issue
+
+### 1.0.0
+- Initial release with core cacheable logic .
+
 
 ## License
 
