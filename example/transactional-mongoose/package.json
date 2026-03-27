@@ -1,6 +1,6 @@
 {
   "name": "mongoose-example",
-  "version": "0.0.1",
+  "version": "1.1.0",
   "description": "",
   "author": "",
   "private": true,
@@ -20,13 +20,13 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@nestplatform/common": "^1.0.1",
-    "@nestplatform/transactional": "^1.0.0",
-    "@nestplatform/transactional-mongoose": "^1.0.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/mongoose": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestplatform/common": "^1.1.0",
+    "@nestplatform/transactional": "^1.1.0",
+    "@nestplatform/transactional-mongoose": "^1.1.0",
     "mongoose": "^8.12.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"

@@ -1,6 +1,6 @@
 {
   "name": "@nestplatform/distribution-lock",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Nestjs Distribution Lock library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@nestplatform/common": "^1.0.1"
+    "@nestplatform/common": "^1.1.0"
   },
   "peerDependencies": {
     "@nestjs/common": "^10.0.0 || ^11.0.0",

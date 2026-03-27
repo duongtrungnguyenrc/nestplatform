@@ -1,6 +1,6 @@
 {
   "name": "feign-example",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Example project demonstrating @nestplatform/feign with both fetch and feign modes",
   "author": "",
   "private": true,
@@ -16,8 +16,8 @@
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
-    "@nestplatform/common": "^1.0.1",
-    "@nestplatform/feign": "^1.0.0",
+    "@nestplatform/common": "^1.1.0",
+    "@nestplatform/feign": "^1.1.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
@@ -25,8 +25,8 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@types/node": "^22.10.7",
-    "json-server": "^0.17.4",
     "concurrently": "^9.1.2",
+    "json-server": "^0.17.4",
     "typescript": "^5.7.3"
   },
   "repository": {
