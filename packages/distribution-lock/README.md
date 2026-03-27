@@ -21,11 +21,11 @@ npm install @nestplatform/distribution-lock
 
 ### 1. Register the module
 
-You need to provide a lock service implementation for your chosen backend (e.g., `@nestplatform/distribution-postgres-advisory`).
+You need to provide a lock service implementation for your chosen backend (e.g., `@nestplatform/distribution-postgres-advisory-lock`).
 
 ```typescript
 import { DistributionLockModule } from '@nestplatform/distribution-lock';
-import { PgLockService } from '@nestplatform/distribution-postgres-advisory';
+import { PgLockService } from '@nestplatform/distribution-postgres-advisory-lock';
 
 @Module({
   imports: [
@@ -111,7 +111,7 @@ export class MyCustomLockService implements IDistributedLockService {
 
 | Package                                       | Backend                      |
 |-----------------------------------------------|------------------------------|
-| `@nestplatform/distribution-postgres-advisory` | PostgreSQL Advisory Locks    |
+| `@nestplatform/distribution-postgres-advisory-lock` | PostgreSQL Advisory Locks    |
 | `@nestplatform/distribution-redlock`           | Redis (Redlock algorithm)    |
 
 ## Changelog

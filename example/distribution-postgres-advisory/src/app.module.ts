@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { DistributionLockModule } from "@nestplatform/distribution-lock";
-import { PgLockModule, PgLockService } from "@nestplatform/distribution-postgres-advisory";
+import { PgLockModule, PgLockService } from "@nestplatform/distribution-postgres-advisory-lock";
 import { LockController } from "./lock.controller";
 import { LockService } from "./lock.service";
 
