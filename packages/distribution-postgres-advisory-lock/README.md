@@ -1,4 +1,4 @@
-# @nestplatform/distribution-postgres-advisory
+# @nestplatform/distribution-postgres-advisory-lock
 
 A PostgreSQL advisory lock adapter for `@nestplatform/distribution-lock`, providing distributed locking using PostgreSQL's built-in session-level advisory locks.
 
@@ -12,7 +12,7 @@ A PostgreSQL advisory lock adapter for `@nestplatform/distribution-lock`, provid
 ## Installation
 
 ```bash
-npm install @nestplatform/distribution-postgres-advisory @nestplatform/distribution-lock pg
+npm install @nestplatform/distribution-postgres-advisory-lock @nestplatform/distribution-lock pg
 npm install -D @types/pg
 ```
 
@@ -23,7 +23,7 @@ npm install -D @types/pg
 Use `PgLockModule` directly without the core `DistributionLockModule`:
 
 ```typescript
-import { PgLockModule } from '@nestplatform/distribution-postgres-advisory';
+import { PgLockModule } from '@nestplatform/distribution-postgres-advisory-lock';
 
 @Module({
   imports: [
@@ -45,7 +45,7 @@ export class AppModule {}
 
 ```typescript
 import { Injectable } from '@nestjs/common';
-import { PgLockService } from '@nestplatform/distribution-postgres-advisory';
+import { PgLockService } from '@nestplatform/distribution-postgres-advisory-lock';
 
 @Injectable()
 export class OrderService {
@@ -70,7 +70,7 @@ Plug into the core decorator system for declarative locking:
 
 ```typescript
 import { DistributionLockModule } from '@nestplatform/distribution-lock';
-import { PgLockService } from '@nestplatform/distribution-postgres-advisory';
+import { PgLockService } from '@nestplatform/distribution-postgres-advisory-lock';
 
 @Module({
   imports: [

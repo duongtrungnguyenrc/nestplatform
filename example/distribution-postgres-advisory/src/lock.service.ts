@@ -1,6 +1,6 @@
 import { Injectable, Inject } from "@nestjs/common";
 import { DistributionLock, IDistributedLockService } from "@nestplatform/distribution-lock";
-import { PGLOCK_SERVICE } from "@nestplatform/distribution-postgres-advisory";
+import { PGLOCK_SERVICE } from "@nestplatform/distribution-postgres-advisory-lock";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
