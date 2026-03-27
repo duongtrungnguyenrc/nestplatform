@@ -9,14 +9,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@nestplatform/common": "^1.0.1"
+    "@nestplatform/common": "^1.0.1",
+    "ms": "^2.1.0"
   },
   "peerDependencies": {
     "@nestjs/cache-manager": "^2.0.0 || ^3.0.0",
     "@nestjs/common": "^10.0.0 || ^11.0.0",
     "@nestjs/core": "^10.0.0 || ^11.0.0",
-    "cache-manager": "^5.0.0 || ^6.0.0 || ^7.0.0",
-    "ms": "^2.1.0"
+    "cache-manager": "^5.0.0 || ^6.0.0 || ^7.0.0"
   },
   "devDependencies": {
     "@types/ms": "^2.1.0"

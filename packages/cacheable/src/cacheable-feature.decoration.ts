@@ -1,7 +1,7 @@
 import { CACHE_MANAGER, Cache } from "@nestjs/cache-manager";
 import * as cacheManagerPackage from "cache-manager";
 import { Inject, Injectable } from "@nestjs/common";
-import ms from "ms";
+import * as ms from "ms";
 
 import { FeatureDecoration } from "@nestplatform/common";
 
