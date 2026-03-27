@@ -1,6 +1,6 @@
 {
   "name": "example-distribution-postgres-advisory",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Example project for @nestplatform/distribution-postgres-advisory",
   "author": "Đường Trung Nguyên",
   "private": true,
@@ -20,8 +20,8 @@
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
-    "@nestplatform/distribution-lock": "^1.0.0",
-    "@nestplatform/distribution-postgres-advisory": "^1.0.0",
+    "@nestplatform/distribution-lock": "^1.1.0",
+    "@nestplatform/distribution-postgres-advisory": "^1.1.0",
     "pg": "^8.13.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"

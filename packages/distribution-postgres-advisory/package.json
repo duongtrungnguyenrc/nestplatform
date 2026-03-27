@@ -1,6 +1,6 @@
 {
   "name": "@nestplatform/distribution-postgres-advisory",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Nestjs Distribution Postgres advisory lock library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,8 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@nestplatform/common": "^1.0.1",
-    "@nestplatform/distribution-lock": "^1.0.0",
+    "@nestplatform/common": "^1.1.0",
+    "@nestplatform/distribution-lock": "^1.1.0",
     "pg": "^8.16.3"
   },
   "devDependencies": {
