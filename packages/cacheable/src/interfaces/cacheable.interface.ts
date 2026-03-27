@@ -1,4 +1,4 @@
-import Ms from "ms";
+import * as Ms from "ms";
 
 /**
  * A key definition that can be either a static value or a function that

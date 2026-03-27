@@ -1,6 +1,6 @@
 import { Injectable, Type } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import Ms from "ms";
+import * as Ms from "ms";
 
 import { MetadataAccessor } from "@nestplatform/common";
 

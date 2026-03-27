@@ -1,3 +1,4 @@
+import { FeatureExplorerModule } from "@nestplatform/common";
 import { DynamicModule, Module } from "@nestjs/common";
 import { CacheModule } from "@nestjs/cache-manager";
 
@@ -60,7 +61,7 @@ export class CacheableModule {
   static register(options: CacheModuleOptions = {}): DynamicModule {
     return {
       module: CacheableModule,
-      imports: [CacheModule.register(options)],
+      imports: [FeatureExplorerModule, CacheModule.register(options)],
       providers: [...CacheableModule.providers],
       exports: [CacheModule],
     };
@@ -79,7 +80,7 @@ export class CacheableModule {
   static registerAsync(options: CacheModuleAsyncOptions = {}): DynamicModule {
     return {
       module: CacheableModule,
-      imports: [CacheModule.registerAsync(options)],
+      imports: [FeatureExplorerModule, CacheModule.registerAsync(options)],
       providers: [...CacheableModule.providers],
       exports: [CacheModule],
     };
