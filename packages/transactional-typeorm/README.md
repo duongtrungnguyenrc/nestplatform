@@ -59,7 +59,7 @@ The `TypeOrmTransactionAdapter` uses a **Proxy Pattern** on your service instanc
 
 ## Changelog
 
-### 1.1.1
+### 1.1.2
 - adjust to allow multi layers transactional (hexagonal, clean architecture)
 
 ### 1.1.0

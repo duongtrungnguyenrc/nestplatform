@@ -59,7 +59,7 @@ export class OrderService {
 
 ## Changelog
 
-### 1.1.1
+### 1.1.2
 - adjust to allow multi layers transactional (hexagonal, clean architecture)
 
 ### 1.0.0
