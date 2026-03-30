@@ -167,7 +167,7 @@ const queryRunner = store?.transaction;
 
 ## Changelog
 
-### 1.1.0
+### 1.1.1
 - Added `@TransactionalEventListener` for transaction lifecycle events.
 - Added `TransactionalEventPublisher` for manual and declarative event publishing.
 - Added `@TransactionalEvent` decorator for automatic event publishing.

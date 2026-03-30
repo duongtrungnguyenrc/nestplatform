@@ -9,6 +9,8 @@ import { TypeOrmTransactionAdapter } from '@nestplatform/transactional-typeorm';
 import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
 import { Order } from './order.entity';
+import { HexagonalModule } from './hexagonal/hexagonal.module';
+import { User } from './hexagonal/core/domain/user.entity';
 
 @Module({
   imports: [
@@ -23,13 +25,14 @@ import { Order } from './order.entity';
         username: configService.getOrThrow<string>('DB_USERNAME'),
         password: configService.getOrThrow<string>('DB_PASSWORD'),
         database: configService.getOrThrow<string>('DB_DATABASE'),
-        entities: [Order],
+        entities: [Order, User],
         logging: true,
         synchronize: true, // Only for development
       }),
     }),
 
     TypeOrmModule.forFeature([Order]),
+    HexagonalModule,
 
     // Register Transactional Module with TypeORM adapter
     TransactionalModule.registerAsync({
