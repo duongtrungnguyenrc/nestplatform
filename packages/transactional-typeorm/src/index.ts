@@ -282,7 +282,7 @@ export class TypeOrmTransactionAdapter implements ITransactionAdapter {
         }
         // Try as predicate
         try {
-          if ((errOption as RollbackOnErrorPredicate)(error) === true) {
+          if ((errOption as RollbackOnErrorPredicate)(error)) {
             return true;
           }
         } catch {
