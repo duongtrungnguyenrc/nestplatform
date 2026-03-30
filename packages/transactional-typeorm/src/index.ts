@@ -116,8 +116,6 @@ export class TypeOrmTransactionAdapter implements ITransactionAdapter {
       get: (target, prop, receiver) => {
         const value: any = Reflect.get(target, prop, receiver);
 
-        console.log("proxy instance:", instance);
-
         // Make sure this context always proxied
         if (typeof value === "function") {
           return function (...args: any[]) {
