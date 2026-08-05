@@ -43,5 +43,8 @@
   "bugs": {
     "url": "https://github.com/duongtrungnguyenrc/nestplatform/issues"
   },
-  "homepage": "https://github.com/duongtrungnguyenrc/nestplatform#readme"
+  "homepage": "https://github.com/duongtrungnguyenrc/nestplatform#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }
