@@ -1,3 +1,24 @@
+<p align="center">
+  <a href="https://github.com/duongtrungnguyenrc/nestplatform">
+    <img src="docs/assets/nestplatform-logo.svg" width="520" alt="NestPlatform" />
+  </a>
+</p>
+
+<p align="center">
+  NestJS support libraries for transactions, distributed locks, Redis, cache decorators, and declarative HTTP clients.
+</p>
+
+<p align="center">
+  <a href="https://github.com/duongtrungnguyenrc/nestplatform/actions/workflows/package-compatibility.yml"><img src="https://img.shields.io/github/actions/workflow/status/duongtrungnguyenrc/nestplatform/package-compatibility.yml?branch=main&label=compatibility&style=flat-square" alt="Package compatibility workflow status" /></a>
+  <a href="https://github.com/duongtrungnguyenrc/nestplatform/actions/workflows/transactional.yml"><img src="https://img.shields.io/github/actions/workflow/status/duongtrungnguyenrc/nestplatform/transactional.yml?branch=main&label=transactional&style=flat-square" alt="Transactional workflow status" /></a>
+  <a href="https://github.com/duongtrungnguyenrc/nestplatform/actions/workflows/npm-release.yml"><img src="https://img.shields.io/github/actions/workflow/status/duongtrungnguyenrc/nestplatform/npm-release.yml?branch=main&label=release&style=flat-square" alt="NPM release workflow status" /></a>
+  <a href="https://www.npmjs.com/package/@nestplatform/transactional"><img src="https://img.shields.io/npm/v/@nestplatform/transactional?style=flat-square" alt="NPM version" /></a>
+  <a href="https://www.npmjs.com/package/@nestplatform/transactional"><img src="https://img.shields.io/npm/dm/@nestplatform/transactional?label=downloads%2Fmonth&style=flat-square" alt="NPM downloads per month" /></a>
+  <a href="https://github.com/duongtrungnguyenrc/nestplatform/stargazers"><img src="https://img.shields.io/github/stars/duongtrungnguyenrc/nestplatform?style=flat-square" alt="GitHub stars" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/duongtrungnguyenrc/nestplatform?style=flat-square" alt="License" /></a>
+  <img src="https://img.shields.io/badge/node-%3E%3D18-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js >= 18" />
+</p>
+
 # @nestplatform Monorepo
 
 This monorepo contains a collection of NestJS support libraries focused on high-level patterns and utilities.
@@ -35,6 +56,24 @@ Build all packages:
 ```bash
 npm run build
 ```
+
+### Release To NPM
+
+Publishing is handled by the **NPM Release** GitHub Actions workflow.
+
+Required repository secret:
+
+```text
+NPM_TOKEN=<npm automation token with publish access to @nestplatform>
+```
+
+Release options:
+
+1. Run the workflow manually with `dry_run=true` to verify packaging.
+2. Run the workflow manually with `dry_run=false` to publish unpublished package versions.
+3. Publish a GitHub Release to trigger the same npm publish flow automatically.
+
+The workflow builds the monorepo, runs a production audit, publishes only packages under `packages/*`, skips versions already available on npm, and uses npm provenance from GitHub Actions.
 
 ### TypeScript Compatibility
 

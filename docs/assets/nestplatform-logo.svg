@@ -1,0 +1,26 @@
+<svg width="960" height="240" viewBox="0 0 960 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">NestPlatform</title>
+  <desc id="desc">NestPlatform monorepo logo</desc>
+  <defs>
+    <linearGradient id="mark" x1="92" y1="34" x2="174" y2="206" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EA2845"/>
+      <stop offset="1" stop-color="#2F6FED"/>
+    </linearGradient>
+    <linearGradient id="text" x1="254" y1="62" x2="752" y2="171" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#151C2D"/>
+      <stop offset="1" stop-color="#2F425F"/>
+    </linearGradient>
+    <filter id="shadow" x="34" y="14" width="194" height="226" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#162033" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="960" height="240" rx="36" fill="#F8FAFC"/>
+  <g filter="url(#shadow)">
+    <path d="M130 28L206 72V160L130 204L54 160V72L130 28Z" fill="url(#mark)"/>
+    <path d="M130 58L180 87V145L130 174L80 145V87L130 58Z" fill="#F8FAFC" fill-opacity="0.95"/>
+    <path d="M104 150V90H126L156 129V90H178V150H156L126 111V150H104Z" fill="url(#mark)"/>
+  </g>
+  <path d="M267 161V76H291L330 124V76H356V161H333L293 112V161H267ZM378 161V76H442V97H404V109H439V129H404V140H444V161H378ZM495 163C484 163 474 161 465 157C456 153 448 148 442 141L458 123C464 129 470 133 476 136C482 139 489 141 496 141C501 141 505 140 508 138C511 136 512 134 512 131C512 128 511 126 508 124C506 122 502 120 497 119L482 115C471 112 463 108 458 103C453 98 450 91 450 82C450 74 453 67 457 62C462 56 468 52 476 49C484 46 492 44 502 44C512 44 522 46 531 49C540 52 547 57 553 63L538 82C532 77 527 73 521 70C515 68 509 66 503 66C499 66 495 67 493 68C490 70 489 72 489 75C489 78 490 80 493 82C495 84 499 85 505 87L519 90C530 93 538 97 543 102C549 108 552 115 552 124C552 136 547 146 537 153C527 160 513 163 495 163ZM582 161V99H558V76H633V99H609V161H582ZM646 161V76H681C693 76 703 78 711 82C719 86 725 91 729 98C733 105 735 113 735 122C735 131 733 139 729 146C725 153 719 158 711 162C703 166 693 168 681 168H673V161H646ZM673 146H681C690 146 697 144 701 140C705 136 707 130 707 122C707 114 705 108 701 104C697 100 690 98 681 98H673V146ZM746 161V76H773V138H812V161H746ZM817 161L850 76H879L912 161H884L879 146H849L844 161H817ZM855 127H873L864 100L855 127Z" fill="url(#text)"/>
+  <path d="M267 197V183H912V197H267Z" fill="#E2E8F0"/>
+  <path d="M267 212V203H698V212H267Z" fill="#CBD5E1"/>
+</svg>
