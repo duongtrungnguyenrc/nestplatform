@@ -20,10 +20,10 @@ const LOGGING_CONTEXT = "TransactionalModule";
  */
 @Injectable()
 export class TransactionalFeatureDecoration extends FeatureDecoration {
-  constructor(
-    @(Inject(TRANSACTION_ADAPTERS) as ParameterDecorator) private readonly adapters: TransactionAdapters,
-    private readonly proxyFactory: TransactionalProxyFactory,
-  ) {
+  @Inject(TRANSACTION_ADAPTERS)
+  private readonly adapters!: TransactionAdapters;
+
+  constructor(private readonly proxyFactory: TransactionalProxyFactory) {
     super();
   }
 

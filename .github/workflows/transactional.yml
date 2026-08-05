@@ -47,6 +47,7 @@ jobs:
       - name: Use TypeScript ${{ matrix.typescript }}
         run: npm install --no-save --package-lock=false typescript@${{ matrix.typescript }}
 
+      - run: npm run build -w @nestplatform/common
       - run: npm run build -w @nestplatform/transactional
       - run: npm run build -w @nestplatform/transactional-typeorm
       - run: npm run build -w @nestplatform/transactional-mongoose
@@ -80,6 +81,7 @@ jobs:
 
       - run: npm ci
 
+      - run: npm run build -w @nestplatform/common
       - run: npm run build -w @nestplatform/transactional
       - run: npm run build -w @nestplatform/transactional-typeorm
       - run: npm run build -w basic
@@ -121,6 +123,7 @@ jobs:
             sleep 1
           done
 
+      - run: npm run build -w @nestplatform/common
       - run: npm run build -w @nestplatform/transactional
       - run: npm run build -w @nestplatform/transactional-mongoose
       - run: npm run build -w mongoose-example
