@@ -10,15 +10,16 @@
   },
   "dependencies": {
     "@nestplatform/common": "^1.1.0",
-    "@nestplatform/distribution-lock": "^1.1.0",
-    "pg": "^8.16.3"
+    "@nestplatform/distribution-lock": "^1.1.0"
   },
   "devDependencies": {
+    "pg": "^8.22.0",
     "@types/pg": "^8.16.0"
   },
   "peerDependencies": {
-    "@nestjs/common": "^10.0.0 || ^11.0.0",
-    "@nestjs/core": "^10.0.0 || ^11.0.0"
+    "@nestjs/common": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0",
+    "@nestjs/core": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0",
+    "pg": "^8.0.0"
   },
   "keywords": [
     "nestjs",

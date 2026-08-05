@@ -7,4 +7,5 @@ export * from "./transactional-feature.decoration";
 export * from "./transactional-metadata.accessor";
 export * from "./transactional-metadata.explorer";
 export * from "./transactional-event.publisher";
+export * from "./transactional-proxy.factory";
 export * from "./types";

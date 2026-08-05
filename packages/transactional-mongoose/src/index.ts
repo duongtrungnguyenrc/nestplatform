@@ -5,6 +5,8 @@ import {
   TransactionContext,
   TransactionStore,
   ITransactionAdapter,
+  TransactionProxyContext,
+  TransactionProxyResource,
   TransactionExecuteOptions,
   TransactionPropagation,
   RollbackOnError,
@@ -37,8 +39,6 @@ const LOGGING_CONTEXT = "MongooseTransactionAdapter";
  * ```
  */
 export class MongooseTransactionAdapter implements ITransactionAdapter {
-  private readonly proxyCache = new WeakMap<object, any>();
-
   /**
    * @internal
    */
@@ -91,105 +91,70 @@ export class MongooseTransactionAdapter implements ITransactionAdapter {
     return this.runInNewSession(callback, options);
   }
 
-  /**
-   * Proxy to override injected mongoose model instances to attach transaction session automatically.
-   */
-  proxyInstance<T extends object>(instance: T): T {
-    return new Proxy(instance, {
-      get: (target, prop, receiver) => {
-        const value: any = Reflect.get(target, prop, receiver);
+  proxyResource(value: any, _context: TransactionProxyContext): TransactionProxyResource | undefined {
+    if (!value) {
+      return undefined;
+    }
 
-        if (!value) {
-          return value;
-        }
+    const isConnectionOrSession =
+      typeof value === "object" && (typeof value.startSession === "function" || typeof value.inTransaction === "function");
+    if (isConnectionOrSession) {
+      return { value };
+    }
 
-        const isModel = typeof value === "function" && value.prototype && (value.prototype instanceof Model || value.prototype.$session);
+    const isModel = typeof value === "function" && value.prototype && (value.prototype instanceof Model || value.prototype.$session);
+    if (!isModel) {
+      return undefined;
+    }
 
-        if (isModel) {
-          const session = TransactionContext.getTransaction<ClientSession>();
+    const session = TransactionContext.getTransaction<ClientSession>();
+    if (!session) {
+      return { value };
+    }
 
-          if (!session) {
-            return value;
+    return {
+      value: new Proxy(value, {
+        /**
+         * Handle model constructor: new Model(data)
+         */
+        construct(modelTarget, argArray, newTarget) {
+          const document = Reflect.construct(modelTarget, argArray, newTarget);
+          if (typeof document.$session === "function") {
+            document.$session(session);
           }
+          return document;
+        },
 
-          return new Proxy(value, {
-            /**
-             * Handle model constructor: new Model(data)
-             */
-            construct(modelTarget, argArray, newTarget) {
-              const document = Reflect.construct(modelTarget, argArray, newTarget);
-              if (typeof document.$session === "function") {
-                document.$session(session);
-              }
-              return document;
-            },
+        /**
+         * Handle static methods: Model.find(), Model.create(), etc.
+         */
+        get(modelTarget, modelProp, modelReceiver) {
+          const modelValue = Reflect.get(modelTarget, modelProp, modelReceiver);
 
-            /**
-             * Handle static methods: Model.find(), Model.create(), etc.
-             */
-            get(modelTarget, modelProp, modelReceiver) {
-              const modelValue = Reflect.get(modelTarget, modelProp, modelReceiver);
-
-              if (typeof modelValue === "function") {
-                return function (...args: any[]) {
-                  const result = modelValue.apply(modelTarget, args);
-
-                  /**
-                   * Auto bind session for query-like objects or other return values
-                   */
-                  if (result && typeof result.session === "function") {
-                    return result.session(session);
-                  }
-
-                  return result;
-                };
+          if (typeof modelValue === "function") {
+            return function (...args: any[]) {
+              if (modelProp === "create") {
+                return modelValue.apply(modelTarget, appendSessionToCreateArgs(args, session));
               }
 
-              return modelValue;
-            },
-          });
-        }
+              if (modelProp === "insertMany" || modelProp === "bulkWrite") {
+                return modelValue.apply(modelTarget, appendSessionToOptionsArg(args, 1, session));
+              }
 
-        if (typeof value === "object") {
-          // Skip built-in objects to avoid issues
-          if (
-            value instanceof Promise ||
-            value instanceof Date ||
-            Array.isArray(value) ||
-            value instanceof RegExp ||
-            value instanceof Map ||
-            value instanceof Set ||
-            value instanceof WeakMap ||
-            value instanceof WeakSet
-          ) {
-            return value;
+              const result = modelValue.apply(modelTarget, args);
+
+              if (result && typeof result.session === "function") {
+                return result.session(session);
+              }
+
+              return result;
+            };
           }
 
-          // We must be careful not to proxy Mongoose's internal Connection/ClientSession
-          if (typeof value.startSession === "function" || typeof value.inTransaction === "function") {
-            return value;
-          }
-
-          // Use WeakMap to store created proxies
-          if (this.proxyCache.has(value)) {
-            return this.proxyCache.get(value);
-          }
-
-          const proxied = this.proxyInstance(value);
-          this.proxyCache.set(value, proxied);
-          return proxied;
-        }
-
-        // Ensure method binding is preserved for regular methods
-        if (typeof value === "function") {
-          return function (...args: any[]) {
-            return value.apply(receiver, args);
-          };
-        }
-
-        return value;
-      },
-    });
+          return modelValue;
+        },
+      }),
+    };
   }
 
   /**
@@ -283,4 +248,28 @@ export class MongooseTransactionAdapter implements ITransactionAdapter {
 
     return false;
   }
+}
+
+function appendSessionToCreateArgs(args: any[], session: ClientSession): any[] {
+  if (Array.isArray(args[0])) {
+    return appendSessionToOptionsArg(args, 1, session);
+  }
+
+  return appendSessionToOptionsArg(args, 1, session);
+}
+
+function appendSessionToOptionsArg(args: any[], optionsIndex: number, session: ClientSession): any[] {
+  const nextArgs = [...args];
+  const options = isPlainObject(nextArgs[optionsIndex]) ? nextArgs[optionsIndex] : {};
+
+  nextArgs[optionsIndex] = {
+    ...options,
+    session: options.session || session,
+  };
+
+  return nextArgs;
+}
+
+function isPlainObject(value: any): value is Record<string, any> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
