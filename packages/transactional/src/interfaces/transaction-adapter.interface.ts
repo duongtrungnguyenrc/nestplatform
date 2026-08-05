@@ -1,5 +1,13 @@
 import { TransactionExecuteOptions } from "../types";
 
+export type TransactionProxyContext = {
+  adapterKey: string;
+};
+
+export type TransactionProxyResource = {
+  value: any;
+};
+
 /**
  * Plugin interface for ORM transaction adapters.
  *
@@ -11,15 +19,20 @@ import { TransactionExecuteOptions } from "../types";
  * 2. Committing on success, rolling back on error
  * 3. Managing savepoints for NESTED propagation
  * 4. Context propagation (storing/retrieving the active transaction)
+ * 5. Resolving ORM-specific resources to transaction-bound resources
  */
 export interface ITransactionAdapter {
   /**
-   * Proxy an instance to inject transaction management logic.
+   * Resolve an ORM-specific resource to its transaction-bound equivalent.
    *
-   * @param instance - The instance to proxy
-   * @returns The proxied instance
+   * The transactional core owns recursive proxy traversal, method binding, and
+   * proxy caching. Adapters only implement resource-specific behavior here
+   * (for example replacing a TypeORM Repository with a QueryRunner repository).
+   *
+   * Return `undefined` when the value is not handled by this adapter.
+   * Return `{ value }` to either replace the resource or mark it as handled.
    */
-  proxyInstance?<T extends object>(instance: T): T;
+  proxyResource(value: any, context: TransactionProxyContext): TransactionProxyResource | undefined;
 
   /**
    * Execute callback within a transaction.
