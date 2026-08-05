@@ -4,10 +4,10 @@ A PostgreSQL advisory lock adapter for `@nestplatform/distribution-lock`, provid
 
 ## Features
 
-- 🐘 **PostgreSQL Native**: Uses `pg_try_advisory_lock()` / `pg_advisory_unlock()` — no external dependencies beyond your existing database.
-- 🔌 **Plug & Play**: Works as a standalone module or as a provider for `@nestplatform/distribution-lock`.
-- 🔑 **String Keys**: Automatically hashes string resource keys to 64-bit integers using SHA-256.
-- ⚡ **Non-Blocking**: Uses `pg_try_advisory_lock()` for immediate, non-blocking lock attempts.
+- **PostgreSQL Native**: Uses `pg_try_advisory_lock()` / `pg_advisory_unlock()` — no external dependencies beyond your existing database.
+- **Plug & Play**: Works as a standalone module or as a provider for `@nestplatform/distribution-lock`.
+- **String Keys**: Automatically hashes string resource keys to 64-bit integers using SHA-256.
+- **Non-Blocking**: Uses `pg_try_advisory_lock()` for immediate, non-blocking lock attempts.
 
 ## Installation
 
@@ -16,6 +16,19 @@ npm install @nestplatform/distribution-postgres-advisory-lock @nestplatform/dist
 npm install -D @types/pg
 ```
 
+## Supported Versions
+
+| Dependency              | Supported Versions |
+| ----------------------- | ------------------ |
+| NestJS `@nestjs/common` | 8, 9, 10, 11       |
+| NestJS `@nestjs/core`   | 8, 9, 10, 11       |
+| `pg`                    | 8                  |
+| TypeScript              | 5, 6               |
+
+NestJS packages and `pg` are peer dependencies; your application owns the concrete Nest and PostgreSQL client runtime versions.
+
+NestJS 12 is currently prerelease and is not included in the peer range yet.
+
 ## Usage
 
 ### Standalone Usage
@@ -23,13 +36,13 @@ npm install -D @types/pg
 Use `PgLockModule` directly without the core `DistributionLockModule`:
 
 ```typescript
-import { PgLockModule } from '@nestplatform/distribution-postgres-advisory-lock';
+import { PgLockModule } from "@nestplatform/distribution-postgres-advisory-lock";
 
 @Module({
   imports: [
     // Option 1: Connection string
     PgLockModule.register({
-      connectionString: 'postgresql://user:pass@localhost:5432/mydb',
+      connectionString: "postgresql://user:pass@localhost:5432/mydb",
     }),
 
     // Option 2: Existing Pool
@@ -44,22 +57,18 @@ export class AppModule {}
 #### Inject and use `PgLockService` directly:
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { PgLockService } from '@nestplatform/distribution-postgres-advisory-lock';
+import { Injectable } from "@nestjs/common";
+import { PgLockService } from "@nestplatform/distribution-postgres-advisory-lock";
 
 @Injectable()
 export class OrderService {
   constructor(private readonly lockService: PgLockService) {}
 
   async processOrder(orderId: string) {
-    await this.lockService.withLock(
-      [`order:${orderId}`],
-      5000,
-      async (signal) => {
-        // Only one process can execute this at a time
-        await this.doWork(orderId);
-      },
-    );
+    await this.lockService.withLock([`order:${orderId}`], 5000, async (signal) => {
+      // Only one process can execute this at a time
+      await this.doWork(orderId);
+    });
   }
 }
 ```
@@ -69,13 +78,13 @@ export class OrderService {
 Plug into the core decorator system for declarative locking:
 
 ```typescript
-import { DistributionLockModule } from '@nestplatform/distribution-lock';
-import { PgLockService } from '@nestplatform/distribution-postgres-advisory-lock';
+import { DistributionLockModule } from "@nestplatform/distribution-lock";
+import { PgLockService } from "@nestplatform/distribution-postgres-advisory-lock";
 
 @Module({
   imports: [
     PgLockModule.register({
-      connectionString: 'postgresql://user:pass@localhost:5432/mydb',
+      connectionString: "postgresql://user:pass@localhost:5432/mydb",
     }),
     DistributionLockModule.registerAsync({
       inject: [PgLockService],
@@ -91,12 +100,12 @@ export class AppModule {}
 Then use the `@DistributionLock()` decorator:
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { DistributionLock } from '@nestplatform/distribution-lock';
+import { Injectable } from "@nestjs/common";
+import { DistributionLock } from "@nestplatform/distribution-lock";
 
 @Injectable()
 export class PaymentService {
-  @DistributionLock({ key: 'payment:process', ttl: 5000, logging: true })
+  @DistributionLock({ key: "payment:process", ttl: 5000, logging: true })
   async processPayment(orderId: string) {
     // Protected by a PostgreSQL advisory lock
   }
@@ -117,9 +126,9 @@ export class PaymentService {
 PgLockModule.registerAsync({
   inject: [ConfigService],
   useFactory: (config: ConfigService) => ({
-    connectionString: config.get('DATABASE_URL'),
+    connectionString: config.get("DATABASE_URL"),
   }),
-})
+});
 ```
 
 ## How It Works
@@ -131,7 +140,14 @@ PgLockModule.registerAsync({
 
 ## Changelog
 
+### Unreleased
+
+- Widened NestJS peer dependency support to stable majors 8 through 11.
+- Moved `pg` to an application-owned peer dependency with a package-local dev dependency for builds.
+- Adjusted async provider and injection decorator typings for TypeScript 6 with older NestJS versions.
+
 ### 1.0.0
+
 - Initial release with PostgreSQL advisory lock support via `pg`.
 
 ## License

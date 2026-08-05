@@ -10,6 +10,18 @@ It uses a powerful, configurable underlying `FetchService` by default but allows
 npm install @nestplatform/feign @nestplatform/common
 ```
 
+## Supported Versions
+
+| Dependency | Supported Versions |
+| --- | --- |
+| NestJS `@nestjs/common` | 8, 9, 10, 11 |
+| NestJS `@nestjs/core` | 8, 9, 10, 11 |
+| TypeScript | 5, 6 |
+
+NestJS packages are peer dependencies; your application owns the concrete Nest runtime versions.
+
+NestJS 12 is currently prerelease and is not included in the peer range yet.
+
 ## Features
 
 - **Declarative REST Clients**: Define HTTP clients using TypeScript classes and decorators, completely removing boilerplate HTTP request code.
@@ -179,5 +191,14 @@ Binds arguments to the underlying request components.
 
 *(Note: The bound object must perfectly align with the expected type or structure of that segment).*
 
+## Changelog
+
+### Unreleased
+
+- Widened NestJS peer dependency support to stable majors 8 through 11.
+- Added compatibility fallbacks for older NestJS metadata scanner APIs.
+- Adjusted decorator and injection token typings for TypeScript 6 with older NestJS versions.
+
 ## License
+
 MIT

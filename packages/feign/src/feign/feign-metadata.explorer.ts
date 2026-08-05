@@ -23,7 +23,7 @@ export class FeignMetadataExplorer implements IFeatureExplorer {
     if (!clientOptions) return;
 
     const proto = Object.getPrototypeOf(instance);
-    const methods: string[] = this.metadataScanner.getAllMethodNames(proto);
+    const methods: string[] = this.getAllMethodNames(instance, proto);
 
     for (const methodName of methods) {
       const methodRef = instance[methodName];
@@ -35,5 +35,19 @@ export class FeignMetadataExplorer implements IFeatureExplorer {
 
       this.featureDecoration.decorateFetch(instance, methodRef, clientOptions, feignMethodOptions);
     }
+  }
+
+  private getAllMethodNames(instance: object, proto: object): string[] {
+    const scanner = this.metadataScanner as any;
+
+    if (typeof scanner.getAllMethodNames === "function") {
+      return scanner.getAllMethodNames(proto);
+    }
+
+    if (typeof scanner.getAllFilteredMethodNames === "function") {
+      return [...scanner.getAllFilteredMethodNames(proto)];
+    }
+
+    return scanner.scanFromPrototype(instance, proto, (methodName: string) => methodName);
   }
 }

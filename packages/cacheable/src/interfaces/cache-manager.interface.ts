@@ -1,5 +1,4 @@
 import { CreateCacheOptions } from "cache-manager";
-import { Keyv, KeyvStoreAdapter } from "keyv";
 
 /**
  * Interface defining Cache Manager configuration options.
@@ -12,7 +11,7 @@ export type CacheManagerOptions = Omit<CreateCacheOptions, "stores"> & {
    * [Different stores](https://docs.nestjs.com/techniques/caching#different-stores)
    * for more info.
    */
-  stores?: Keyv | KeyvStoreAdapter | (Keyv | KeyvStoreAdapter)[];
+  stores?: CreateCacheOptions["stores"];
   /**
    * Cache storage namespace, default is `keyv`.
    * This is a global configuration that applies to all `KeyvStoreAdapter` instances.

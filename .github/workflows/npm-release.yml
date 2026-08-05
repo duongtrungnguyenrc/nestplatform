@@ -1,0 +1,88 @@
+name: NPM Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run npm publish with --dry-run"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      - run: npm audit --omit=dev
+
+      - run: npm run build
+
+      - name: Verify npm token
+        if: env.DRY_RUN != 'true'
+        run: npm whoami
+
+      - name: Publish packages
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          publish_args=(--access public)
+          if [ "$DRY_RUN" = "true" ]; then
+            publish_args+=(--dry-run)
+          else
+            publish_args+=(--provenance)
+          fi
+
+          packages=(
+            packages/common
+            packages/transactional
+            packages/transactional-typeorm
+            packages/transactional-mongoose
+            packages/cacheable
+            packages/distribution-lock
+            packages/distribution-postgres-advisory-lock
+            packages/redis
+            packages/distribution-redlock
+            packages/feign
+          )
+
+          for package_dir in "${packages[@]}"; do
+            name=$(node -p "require('./${package_dir}/package.json').name")
+            version=$(node -p "require('./${package_dir}/package.json').version")
+
+            if npm view "${name}@${version}" version >/dev/null 2>&1; then
+              echo "Skipping ${name}@${version}; already published."
+              continue
+            fi
+
+            echo "Publishing ${name}@${version}"
+            (cd "${package_dir}" && npm publish "${publish_args[@]}")
+          done

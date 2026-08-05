@@ -4,18 +4,31 @@ A flexible NestJS module for managing Redis connections, supporting both standal
 
 ## Features
 
-- 🔌 **Standalone & Cluster**: First-class support for single-node and cluster deployments.
-- 🔒 **TLS/SSL**: Built-in TLS configuration for secure connections.
-- 🏷️ **Custom Tokens**: Register multiple Redis connections with custom injection tokens.
-- ⚡ **Async Config**: Factory-based registration for runtime configuration (e.g., from `ConfigService`).
-- 💉 **Decorator Support**: `@InjectRedis()` for clean dependency injection.
-- 📝 **Logging**: Optional connection lifecycle logging.
+- **Standalone & Cluster**: First-class support for single-node and cluster deployments.
+- **TLS/SSL**: Built-in TLS configuration for secure connections.
+- **Custom Tokens**: Register multiple Redis connections with custom injection tokens.
+- **Async Config**: Factory-based registration for runtime configuration (e.g., from `ConfigService`).
+- **Decorator Support**: `@InjectRedis()` for clean dependency injection.
+- **Logging**: Optional connection lifecycle logging.
 
 ## Installation
 
 ```bash
 npm install @nestplatform/redis ioredis
 ```
+
+## Supported Versions
+
+| Dependency              | Supported Versions |
+| ----------------------- | ------------------ |
+| NestJS `@nestjs/common` | 8, 9, 10, 11       |
+| NestJS `@nestjs/core`   | 8, 9, 10, 11       |
+| `ioredis`               | 5                  |
+| TypeScript              | 5, 6               |
+
+NestJS packages and `ioredis` are peer dependencies; your application owns the concrete Nest and Redis client runtime versions.
+
+NestJS 12 is currently prerelease and is not included in the peer range yet.
 
 ## Usage
 
@@ -24,13 +37,13 @@ npm install @nestplatform/redis ioredis
 #### Synchronous
 
 ```typescript
-import { RedisModule } from '@nestplatform/redis';
+import { RedisModule } from "@nestplatform/redis";
 
 @Module({
   imports: [
     RedisModule.register({
-      mode: 'standalone',
-      host: 'localhost',
+      mode: "standalone",
+      host: "localhost",
       port: 6379,
       logging: true,
     }),
@@ -42,18 +55,18 @@ export class AppModule {}
 #### Asynchronous (with ConfigService)
 
 ```typescript
-import { RedisModule } from '@nestplatform/redis';
-import { ConfigService } from '@nestjs/config';
+import { RedisModule } from "@nestplatform/redis";
+import { ConfigService } from "@nestjs/config";
 
 @Module({
   imports: [
     RedisModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        mode: 'standalone',
-        host: config.get('REDIS_HOST'),
-        port: config.get('REDIS_PORT'),
-        password: config.get('REDIS_PASSWORD'),
+        mode: "standalone",
+        host: config.get("REDIS_HOST"),
+        port: config.get("REDIS_PORT"),
+        password: config.get("REDIS_PASSWORD"),
       }),
       logging: true,
     }),
@@ -65,8 +78,8 @@ export class AppModule {}
 ### 2. Inject the client
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { InjectRedis, RedisClient } from '@nestplatform/redis';
+import { Injectable } from "@nestjs/common";
+import { InjectRedis, RedisClient } from "@nestplatform/redis";
 
 @Injectable()
 export class CacheService {
@@ -78,7 +91,7 @@ export class CacheService {
 
   async set(key: string, value: string, ttl?: number): Promise<void> {
     if (ttl) {
-      await this.redis.set(key, value, 'PX', ttl);
+      await this.redis.set(key, value, "PX", ttl);
     } else {
       await this.redis.set(key, value);
     }
@@ -94,16 +107,16 @@ Register multiple Redis instances with custom injection tokens:
 @Module({
   imports: [
     RedisModule.register({
-      mode: 'standalone',
-      host: 'cache-host',
+      mode: "standalone",
+      host: "cache-host",
       port: 6379,
-      injectionToken: 'CACHE_REDIS',
+      injectionToken: "CACHE_REDIS",
     }),
     RedisModule.register({
-      mode: 'standalone',
-      host: 'session-host',
+      mode: "standalone",
+      host: "session-host",
       port: 6379,
-      injectionToken: 'SESSION_REDIS',
+      injectionToken: "SESSION_REDIS",
     }),
   ],
 })
@@ -111,7 +124,7 @@ export class AppModule {}
 
 @Injectable()
 export class SessionService {
-  constructor(@InjectRedis('SESSION_REDIS') private readonly redis: RedisClient) {}
+  constructor(@InjectRedis("SESSION_REDIS") private readonly redis: RedisClient) {}
 }
 ```
 
@@ -119,48 +132,55 @@ export class SessionService {
 
 ```typescript
 RedisModule.register({
-  mode: 'cluster',
+  mode: "cluster",
   nodes: [
-    { host: 'node1.redis.example.com', port: 6379 },
-    { host: 'node2.redis.example.com', port: 6379 },
-    { host: 'node3.redis.example.com', port: 6379 },
+    { host: "node1.redis.example.com", port: 6379 },
+    { host: "node2.redis.example.com", port: 6379 },
+    { host: "node3.redis.example.com", port: 6379 },
   ],
   options: {
-    redisOptions: { password: 'secret' },
+    redisOptions: { password: "secret" },
   },
   logging: true,
-})
+});
 ```
 
 ## TLS Configuration
 
 ```typescript
 RedisModule.register({
-  mode: 'standalone',
-  host: 'secure.redis.example.com',
+  mode: "standalone",
+  host: "secure.redis.example.com",
   port: 6380,
   tls: {
-    ca: fs.readFileSync('/path/to/ca.pem'),
+    ca: fs.readFileSync("/path/to/ca.pem"),
     rejectUnauthorized: true,
   },
-})
+});
 ```
 
 ## API Reference
 
-| Export | Description |
-|--------|-------------|
-| `RedisModule` | Dynamic NestJS module with `register()` and `registerAsync()` |
-| `InjectRedis(token?)` | Parameter decorator for injecting the Redis client |
-| `createRedisClient(config, logging?)` | Utility to manually create an `ioredis` client |
-| `RedisClient` | Type alias for `Redis \| Cluster` from `ioredis` |
-| `RedisConfig` | Discriminated union of standalone and cluster configs |
-| `REDIS_CLIENT` | Default injection token for the client |
-| `REDIS_CONFIG` | Injection token for the config object |
+| Export                                | Description                                                   |
+| ------------------------------------- | ------------------------------------------------------------- |
+| `RedisModule`                         | Dynamic NestJS module with `register()` and `registerAsync()` |
+| `InjectRedis(token?)`                 | Parameter decorator for injecting the Redis client            |
+| `createRedisClient(config, logging?)` | Utility to manually create an `ioredis` client                |
+| `RedisClient`                         | Type alias for `Redis \| Cluster` from `ioredis`              |
+| `RedisConfig`                         | Discriminated union of standalone and cluster configs         |
+| `REDIS_CLIENT`                        | Default injection token for the client                        |
+| `REDIS_CONFIG`                        | Injection token for the config object                         |
 
 ## Changelog
 
+### Unreleased
+
+- Widened NestJS peer dependency support to stable majors 8 through 11.
+- Moved `ioredis` to an application-owned peer dependency with a package-local dev dependency for builds.
+- Adjusted async provider typing for TypeScript 6 with older NestJS versions.
+
 ### 1.0.0
+
 - Initial release with standalone and cluster support.
 
 ## License

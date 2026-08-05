@@ -1,12 +1,18 @@
-import { CACHE_MANAGER, Cache } from "@nestjs/cache-manager";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import * as cacheManagerPackage from "cache-manager";
 import { Inject, Injectable } from "@nestjs/common";
-import * as ms from "ms";
+import ms = require("ms");
 
 import { FeatureDecoration } from "@nestplatform/common";
 
 import { CacheableOptions, CacheEvictOptions, CachePutOptions, CacheTtl } from "./interfaces";
 import { generateComposedKey } from "./cacheable.helpers";
+
+type CacheStore = {
+  get: (key: string) => Promise<any> | any;
+  set: (key: string, value: any, ttl?: any) => Promise<any> | any;
+  del: (key: string) => Promise<boolean> | boolean;
+};
 
 /**
  * Core service that implements the caching logic for all cache decorators.
@@ -22,7 +28,7 @@ export class CacheableFeatureDecoration extends FeatureDecoration {
   private readonly pendingCacheMap = new Map<string, Promise<any>>();
   private readonly isCacheManagerV5OrGreater: boolean;
 
-  constructor(@Inject(CACHE_MANAGER) private readonly cache: Cache) {
+  constructor(@(Inject(CACHE_MANAGER) as ParameterDecorator) private readonly cache: CacheStore) {
     super();
 
     this.isCacheManagerV5OrGreater = typeof (cacheManagerPackage as any).createCache === "function";
@@ -41,7 +47,7 @@ export class CacheableFeatureDecoration extends FeatureDecoration {
     let pendingCachePromise = this.pendingCacheMap.get(key);
 
     if (!pendingCachePromise) {
-      pendingCachePromise = this.cache.get(key) || Promise.resolve(undefined);
+      pendingCachePromise = Promise.resolve(this.cache.get(key));
       this.pendingCacheMap.set(key, pendingCachePromise);
     }
 
@@ -168,7 +174,7 @@ export class CacheableFeatureDecoration extends FeatureDecoration {
           return Array.isArray(composed) ? composed : [composed];
         });
 
-        await Promise.all(keysToDelete.map((key: string): Promise<boolean> => this.cache.del(key)));
+        await Promise.all(keysToDelete.map((key: string): Promise<boolean> => Promise.resolve(this.cache.del(key))));
 
         /* eslint-disable-next-line no-empty */
       } catch {} // Empty catch to avoid affecting the main logic

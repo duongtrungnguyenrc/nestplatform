@@ -16,6 +16,20 @@ Spring-like declarative caching decorators for NestJS based on `cache-manager`.
 npm install @nestplatform/cacheable @nestjs/cache-manager cache-manager ms
 ```
 
+## Supported Versions
+
+| Dependency | Supported Versions |
+| --- | --- |
+| NestJS `@nestjs/common` | 9, 10, 11 |
+| NestJS `@nestjs/core` | 9, 10, 11 |
+| `@nestjs/cache-manager` | 1, 2, 3 |
+| `cache-manager` | 5, 6, 7 |
+| TypeScript | 5, 6 |
+
+NestJS packages are peer dependencies; your application owns the concrete Nest runtime versions.
+
+NestJS 8 is not listed because `@nestjs/cache-manager` starts in the NestJS 9 era. NestJS 12 is currently prerelease and is not included in peer ranges yet.
+
 ## Setup
 
 Register the `CacheableModule` in your `AppModule`. It wraps the standard `@nestjs/cache-manager` `CacheModule`.
@@ -133,6 +147,13 @@ Namespaces allow you to prefix your cache keys, useful for grouping related cach
 @Cacheable({ namespace: 'v1', key: (id) => `user:${id}` }) // Result: v1:user:123
 ```
 ## Changelog
+
+### Unreleased
+
+- Widened NestJS peer dependency support to stable majors 9 through 11.
+- Added support for `@nestjs/cache-manager` 1, 2, and 3 as peer versions.
+- Added package-local dev dependencies for peer-only cache integration packages.
+- Made cache manager store typings resilient across supported `cache-manager` and Keyv versions.
 
 ### 1.0.1
 - Resolve ms dependency issue

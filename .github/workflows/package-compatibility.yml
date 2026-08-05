@@ -1,0 +1,109 @@
+name: Package Compatibility
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/package-compatibility.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "packages/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/package-compatibility.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "packages/**"
+
+jobs:
+  nest-peer-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        typescript: ["5", "6"]
+        nest: ["8", "9", "10", "11"]
+        include:
+          - nest: "8"
+            typeorm: "9"
+            typeorm-lib: "0.3"
+            mongoose: "9"
+            mongoose-lib: "6"
+            cache-manager: ""
+            cache-manager-lib: ""
+            keyv: ""
+            build-cacheable: "false"
+          - nest: "9"
+            typeorm: "9"
+            typeorm-lib: "0.3"
+            mongoose: "9"
+            mongoose-lib: "7"
+            cache-manager: "1"
+            cache-manager-lib: "5"
+            keyv: ""
+            build-cacheable: "true"
+          - nest: "10"
+            typeorm: "10"
+            typeorm-lib: "0.3"
+            mongoose: "10"
+            mongoose-lib: "8"
+            cache-manager: "2"
+            cache-manager-lib: "5"
+            keyv: ""
+            build-cacheable: "true"
+          - nest: "11"
+            typeorm: "11"
+            typeorm-lib: "0.3"
+            mongoose: "11"
+            mongoose-lib: "9"
+            cache-manager: "3"
+            cache-manager-lib: "7"
+            keyv: "5"
+            build-cacheable: "true"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install compatibility versions
+        run: |
+          npm install --no-save --package-lock=false --legacy-peer-deps \
+            typescript@${{ matrix.typescript }} \
+            @nestjs/common@${{ matrix.nest }} \
+            @nestjs/core@${{ matrix.nest }} \
+            @nestjs/typeorm@${{ matrix.typeorm }} \
+            @nestjs/mongoose@${{ matrix.mongoose }} \
+            typeorm@${{ matrix.typeorm-lib }} \
+            mongoose@${{ matrix.mongoose-lib }}
+
+          if [ -n "${{ matrix.cache-manager }}" ]; then
+            npm install --no-save --package-lock=false --legacy-peer-deps \
+              @nestjs/cache-manager@${{ matrix.cache-manager }} \
+              cache-manager@${{ matrix.cache-manager-lib }}
+          fi
+
+          if [ -n "${{ matrix.keyv }}" ]; then
+            npm install --no-save --package-lock=false --legacy-peer-deps \
+              keyv@${{ matrix.keyv }}
+          fi
+
+      - run: npm run build -w @nestplatform/common
+      - run: npm run build -w @nestplatform/transactional
+      - run: npm run build -w @nestplatform/transactional-typeorm
+      - run: npm run build -w @nestplatform/transactional-mongoose
+      - run: npm run build -w @nestplatform/distribution-lock
+      - run: npm run build -w @nestplatform/distribution-postgres-advisory-lock
+      - run: npm run build -w @nestplatform/redis
+      - run: npm run build -w @nestplatform/distribution-redlock
+      - run: npm run build -w @nestplatform/feign
+      - run: npm run build -w @nestplatform/cacheable
+        if: matrix.build-cacheable == 'true'
