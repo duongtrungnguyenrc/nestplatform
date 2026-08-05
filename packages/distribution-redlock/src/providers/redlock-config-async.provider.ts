@@ -5,7 +5,7 @@ import { mergeWithDefaults } from "@nestplatform/common";
 import { defaultRedlockConfig, REDLOCK_CONFIG } from "../redlock.constant";
 import { RedlockConfig, RedlockModuleConfigAsync } from "../redlock.type";
 
-export const RedlockConfigAsyncProvider = (config: RedlockModuleConfigAsync): FactoryProvider<RedlockConfig> => {
+export const RedlockConfigAsyncProvider = (config: RedlockModuleConfigAsync): FactoryProvider<any> => {
   return {
     provide: REDLOCK_CONFIG,
     inject: config.inject,

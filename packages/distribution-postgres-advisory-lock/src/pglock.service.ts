@@ -35,7 +35,7 @@ import { EventEmitter } from "events";
  */
 @Injectable()
 export class PgLockService implements IDistributedLockService {
-  constructor(@Inject(PG_ADVISORY_POOL) private readonly pool: Pool) {}
+  constructor(@(Inject(PG_ADVISORY_POOL) as ParameterDecorator) private readonly pool: Pool) {}
 
   /**
    * Acquire advisory locks on the given resources.
@@ -67,7 +67,7 @@ export class PgLockService implements IDistributedLockService {
         throw e;
       }
 
-      throw new LockExecutionException(e);
+      throw new LockExecutionException(e instanceof Error ? e.message : String(e));
     }
   }
 

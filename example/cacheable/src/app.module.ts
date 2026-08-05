@@ -4,6 +4,9 @@ import { ProductService } from "./product.service";
 import { ProductController } from "./product.controller";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import KeyvPostgres from "@keyv/postgres";
+import { CreateCacheOptions } from "cache-manager";
+
+type CacheStores = NonNullable<CreateCacheOptions["stores"]>;
 
 @Module({
   imports: [
@@ -23,13 +26,13 @@ import KeyvPostgres from "@keyv/postgres";
         return {
           ttl: 6000 * 5,
           isGlobal: true,
-          stores: [
+          stores: ([
             new KeyvPostgres({
               uri: `postgresql://${user}:${pass}@${host}:${port}/${db}`,
               schema: "public",
               table: "cache",
             }),
-          ],
+          ] as unknown) as CacheStores,
         };
       },
     }),

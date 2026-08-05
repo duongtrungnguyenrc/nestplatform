@@ -20,7 +20,7 @@ const LOGGING_CONTEXT = "DISTRIBUTION_LOCK";
  */
 @Injectable()
 export class DistributionLockFeatureDecoration extends FeatureDecoration {
-  constructor(@Inject(DISTRIBUTION_LOCK_SERVICES) private readonly lockServices: DistributedLockServices) {
+  constructor(@(Inject(DISTRIBUTION_LOCK_SERVICES) as ParameterDecorator) private readonly lockServices: DistributedLockServices) {
     super();
   }
 

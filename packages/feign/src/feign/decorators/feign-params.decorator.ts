@@ -3,7 +3,9 @@ import "reflect-metadata";
 import { FEIGN_BODY_PARAMS_METADATA, FEIGN_HEADER_PARAMS_METADATA, FEIGN_PATH_PARAMS_METADATA, FEIGN_QUERY_PARAMS_METADATA } from "../feign.constant";
 
 export const Params = (): ParameterDecorator => {
-  return (target: object, propertyKey: string | symbol, parameterIndex: number) => {
+  return (target: object, propertyKey: string | symbol | undefined, parameterIndex: number) => {
+    if (propertyKey === undefined) return;
+
     const existingParams: number[] = Reflect.getOwnMetadata(FEIGN_PATH_PARAMS_METADATA, target, propertyKey) || [];
 
     existingParams.push(parameterIndex);
@@ -12,7 +14,9 @@ export const Params = (): ParameterDecorator => {
 };
 
 export const Queries = (): ParameterDecorator => {
-  return (target: object, propertyKey: string | symbol, parameterIndex: number) => {
+  return (target: object, propertyKey: string | symbol | undefined, parameterIndex: number) => {
+    if (propertyKey === undefined) return;
+
     const existingParams: number[] = Reflect.getOwnMetadata(FEIGN_QUERY_PARAMS_METADATA, target, propertyKey) || [];
 
     existingParams.push(parameterIndex);
@@ -21,7 +25,9 @@ export const Queries = (): ParameterDecorator => {
 };
 
 export const Body = (): ParameterDecorator => {
-  return (target: object, propertyKey: string | symbol, parameterIndex: number) => {
+  return (target: object, propertyKey: string | symbol | undefined, parameterIndex: number) => {
+    if (propertyKey === undefined) return;
+
     const existingParams: number[] = Reflect.getOwnMetadata(FEIGN_BODY_PARAMS_METADATA, target, propertyKey) || [];
     existingParams.push(parameterIndex);
 
@@ -30,7 +36,9 @@ export const Body = (): ParameterDecorator => {
 };
 
 export const Headers = (): ParameterDecorator => {
-  return (target: object, propertyKey: string | symbol, parameterIndex: number) => {
+  return (target: object, propertyKey: string | symbol | undefined, parameterIndex: number) => {
+    if (propertyKey === undefined) return;
+
     const existingParams: number[] = Reflect.getOwnMetadata(FEIGN_HEADER_PARAMS_METADATA, target, propertyKey) || [];
     existingParams.push(parameterIndex);
 

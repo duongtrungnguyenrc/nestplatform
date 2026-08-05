@@ -1,3 +1,7 @@
 node_modules/
 **/dist/
 *.tsbuildinfo
+.codegraph
+data/
+.tmp/
+.DS_Store

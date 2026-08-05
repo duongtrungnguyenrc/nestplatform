@@ -4,18 +4,31 @@ A distributed locking module for NestJS implementing the [Redlock algorithm](htt
 
 ## Features
 
-- 🔐 **Distributed Locking**: Quorum-based lock acquisition across multiple Redis instances.
-- ♻️ **Auto-Extension**: Locks are automatically extended before expiration when using `withLock`.
-- 🔁 **Configurable Retries**: Retry count, delay, and jitter for resilient lock acquisition.
-- 🛡️ **Abort Signal**: Handler receives an `AbortSignal` if lock extension fails.
-- 🎯 **ORM Agnostic**: Implements `IDistributedLockService` from `@nestplatform/distribution-lock`.
-- 📝 **Observable**: Emits `error` events for monitoring partial failures.
+- **Distributed Locking**: Quorum-based lock acquisition across multiple Redis instances.
+- **Auto-Extension**: Locks are automatically extended before expiration when using `withLock`.
+- **Configurable Retries**: Retry count, delay, and jitter for resilient lock acquisition.
+- **Abort Signal**: Handler receives an `AbortSignal` if lock extension fails.
+- **ORM Agnostic**: Implements `IDistributedLockService` from `@nestplatform/distribution-lock`.
+- **Observable**: Emits `error` events for monitoring partial failures.
 
 ## Installation
 
 ```bash
 npm install @nestplatform/distribution-redlock @nestplatform/redis @nestplatform/distribution-lock ioredis
 ```
+
+## Supported Versions
+
+| Dependency              | Supported Versions |
+| ----------------------- | ------------------ |
+| NestJS `@nestjs/common` | 8, 9, 10, 11       |
+| NestJS `@nestjs/core`   | 8, 9, 10, 11       |
+| `ioredis`               | 5                  |
+| TypeScript              | 5, 6               |
+
+NestJS packages and `ioredis` are peer dependencies; your application owns the concrete Nest and Redis client runtime versions.
+
+NestJS 12 is currently prerelease and is not included in the peer range yet.
 
 ## Usage
 
@@ -24,15 +37,15 @@ npm install @nestplatform/distribution-redlock @nestplatform/redis @nestplatform
 #### Synchronous (creates Redis clients internally)
 
 ```typescript
-import { RedlockModule } from '@nestplatform/distribution-redlock';
+import { RedlockModule } from "@nestplatform/distribution-redlock";
 
 @Module({
   imports: [
     RedlockModule.register({
       redisClients: [
-        { mode: 'standalone', host: 'redis-1', port: 6379 },
-        { mode: 'standalone', host: 'redis-2', port: 6379 },
-        { mode: 'standalone', host: 'redis-3', port: 6379 },
+        { mode: "standalone", host: "redis-1", port: 6379 },
+        { mode: "standalone", host: "redis-2", port: 6379 },
+        { mode: "standalone", host: "redis-3", port: 6379 },
       ],
       retryCount: 5,
       retryDelay: 200,
@@ -45,14 +58,14 @@ export class AppModule {}
 #### Asynchronous (reuse existing Redis clients)
 
 ```typescript
-import { RedlockModule } from '@nestplatform/distribution-redlock';
-import { REDIS_CLIENT } from '@nestplatform/redis';
+import { RedlockModule } from "@nestplatform/distribution-redlock";
+import { REDIS_CLIENT } from "@nestplatform/redis";
 
 @Module({
   imports: [
     RedisModule.register({
-      mode: 'standalone',
-      host: 'localhost',
+      mode: "standalone",
+      host: "localhost",
       port: 6379,
     }),
     RedlockModule.registerAsync({
@@ -72,8 +85,8 @@ export class AppModule {}
 #### Basic acquire / release
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { RedlockService } from '@nestplatform/distribution-redlock';
+import { Injectable } from "@nestjs/common";
+import { RedlockService } from "@nestplatform/distribution-redlock";
 
 @Injectable()
 export class OrderService {
@@ -101,20 +114,16 @@ export class PaymentService {
   constructor(private readonly redlock: RedlockService) {}
 
   async transfer(senderId: string, recipientId: string, amount: number) {
-    return this.redlock.withLock(
-      [`account:${senderId}`, `account:${recipientId}`],
-      5000,
-      async (signal) => {
-        // Check abort signal for extension failures
-        if (signal.aborted) throw signal.error;
+    return this.redlock.withLock([`account:${senderId}`, `account:${recipientId}`], 5000, async (signal) => {
+      // Check abort signal for extension failures
+      if (signal.aborted) throw signal.error;
 
-        const sender = await this.getBalance(senderId);
-        if (sender < amount) throw new Error('Insufficient balance');
+      const sender = await this.getBalance(senderId);
+      if (sender < amount) throw new Error("Insufficient balance");
 
-        await this.updateBalances(senderId, recipientId, amount);
-        return { success: true };
-      },
-    );
+      await this.updateBalances(senderId, recipientId, amount);
+      return { success: true };
+    });
   }
 }
 ```
@@ -124,7 +133,7 @@ export class PaymentService {
 When combined with `@nestplatform/distribution-lock`, you can use the declarative decorator:
 
 ```typescript
-import { DistributedLock } from '@nestplatform/distribution-lock';
+import { DistributedLock } from "@nestplatform/distribution-lock";
 
 @Injectable()
 export class InventoryService {
@@ -132,7 +141,7 @@ export class InventoryService {
   async reserveStock(productId: string, quantity: number) {
     // This method runs under a distributed lock automatically
     const stock = await this.getStock(productId);
-    if (stock < quantity) throw new Error('Out of stock');
+    if (stock < quantity) throw new Error("Out of stock");
     await this.updateStock(productId, stock - quantity);
   }
 }
@@ -148,9 +157,9 @@ export class LockMonitor implements OnModuleInit {
   constructor(private readonly redlock: RedlockService) {}
 
   onModuleInit() {
-    this.redlock.on('error', (error) => {
+    this.redlock.on("error", (error) => {
       // Non-fatal errors on minority nodes (quorum not affected)
-      console.warn('Redlock partial failure:', error.message);
+      console.warn("Redlock partial failure:", error.message);
     });
   }
 }
@@ -158,25 +167,25 @@ export class LockMonitor implements OnModuleInit {
 
 ## Configuration
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `driftFactor` | `0.01` | Clock drift factor (1% of lock TTL) |
-| `retryCount` | `3` | Max retry attempts (`-1` for infinite) |
-| `retryDelay` | `200` | Delay in ms between retries |
-| `retryJitter` | `100` | Random jitter ±ms added to retry delay |
-| `automaticExtensionThreshold` | `500` | Extend lock this many ms before expiration |
-| `logging` | `false` | Enable lifecycle logging |
+| Option                        | Default | Description                                |
+| ----------------------------- | ------- | ------------------------------------------ |
+| `driftFactor`                 | `0.01`  | Clock drift factor (1% of lock TTL)        |
+| `retryCount`                  | `3`     | Max retry attempts (`-1` for infinite)     |
+| `retryDelay`                  | `200`   | Delay in ms between retries                |
+| `retryJitter`                 | `100`   | Random jitter ±ms added to retry delay     |
+| `automaticExtensionThreshold` | `500`   | Extend lock this many ms before expiration |
+| `logging`                     | `false` | Enable lifecycle logging                   |
 
 ## API Reference
 
-| Export | Description |
-|--------|-------------|
-| `RedlockModule` | Dynamic NestJS module with `register()` and `registerAsync()` |
-| `RedlockService` | Core service: `acquire()`, `release()`, `extend()`, `withLock()` |
-| `RedLock` | Lock handle with convenience `release()` and `extend()` methods |
-| `RedlockConfig` | Configuration type for the algorithm |
-| `Client` | Type alias for `RedisClient` from `@nestplatform/redis` |
-| `REDLOCK_SERVICE` | Injection token for token-based injection |
+| Export            | Description                                                      |
+| ----------------- | ---------------------------------------------------------------- |
+| `RedlockModule`   | Dynamic NestJS module with `register()` and `registerAsync()`    |
+| `RedlockService`  | Core service: `acquire()`, `release()`, `extend()`, `withLock()` |
+| `RedLock`         | Lock handle with convenience `release()` and `extend()` methods  |
+| `RedlockConfig`   | Configuration type for the algorithm                             |
+| `Client`          | Type alias for `RedisClient` from `@nestplatform/redis`          |
+| `REDLOCK_SERVICE` | Injection token for token-based injection                        |
 
 ## How Redlock Works
 
@@ -191,7 +200,14 @@ For maximum safety, use **3 or 5** independent Redis instances (not replicas).
 
 ## Changelog
 
+### Unreleased
+
+- Widened NestJS peer dependency support to stable majors 8 through 11.
+- Aligned `@nestplatform/redis` to v1.1 and kept `ioredis` as an application-owned peer dependency.
+- Adjusted async provider and injection decorator typings for TypeScript 6 with older NestJS versions.
+
 ### 1.0.0
+
 - Initial release with Redlock algorithm implementation.
 - Supports quorum-based acquire/extend/release.
 - Auto-extending locks via `withLock`.

@@ -4,7 +4,7 @@ import { Pool } from "pg";
 import { PgLockModuleConfig, PgLockModuleConfigAsync } from "../types";
 import { PG_ADVISORY_POOL } from "../pglock.constant";
 
-export const PgAdvisoryPoolAsyncProvider = (config: PgLockModuleConfigAsync): FactoryProvider<Pool> => ({
+export const PgAdvisoryPoolAsyncProvider = (config: PgLockModuleConfigAsync): FactoryProvider<any> => ({
   provide: PG_ADVISORY_POOL,
   inject: config.inject,
   useFactory: async (...args) => {

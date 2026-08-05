@@ -33,8 +33,8 @@ export class RedlockService extends EventEmitter implements IDistributedLockServ
   private readonly clients: Set<Client>;
 
   public constructor(
-    @Inject(REDLOCK_REDIS_CLIENTS) clients: Client[],
-    @Inject(REDLOCK_CONFIG) private readonly config: RedlockConfig,
+    @(Inject(REDLOCK_REDIS_CLIENTS) as ParameterDecorator) clients: Client[],
+    @(Inject(REDLOCK_CONFIG) as ParameterDecorator) private readonly config: RedlockConfig,
   ) {
     super();
 

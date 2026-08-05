@@ -29,8 +29,8 @@ export type PutOptions = Omit<FetchOptions, "method">;
 export type DeleteOptions = Omit<FetchOptions, "method" | "body">;
 export type PatchOptions = Omit<FetchOptions, "method">;
 
-export type FetchRequestInterceptor = IFetchRequestInterceptor | IFetchRequestInterceptor["intercept"] | InjectionToken<IFetchRequestInterceptor>;
-export type FetchResponseInterceptor = IFetchResponseInterceptor | IFetchResponseInterceptor["intercept"] | InjectionToken<IFetchResponseInterceptor>;
+export type FetchRequestInterceptor = IFetchRequestInterceptor | IFetchRequestInterceptor["intercept"] | InjectionToken;
+export type FetchResponseInterceptor = IFetchResponseInterceptor | IFetchResponseInterceptor["intercept"] | InjectionToken;
 
 export type FetchResponse = Response;
 

@@ -22,7 +22,7 @@ import { isPlainObject } from "@nestplatform/common";
 export class FetchService {
   constructor(
     private readonly fetchInterceptorExplorer: FetchInterceptorExplorer,
-    @Inject(FETCH_CONFIG) private readonly config: FetchConfig,
+    @(Inject(FETCH_CONFIG) as ParameterDecorator) private readonly config: FetchConfig,
   ) {}
 
   private resolvePathParams(path: string, params: FetchPathParams = {}): string {
