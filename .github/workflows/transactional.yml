@@ -1,0 +1,135 @@
+name: Transactional
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/transactional.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "packages/transactional/**"
+      - "packages/transactional-typeorm/**"
+      - "packages/transactional-mongoose/**"
+      - "example/transactional-typeorm/**"
+      - "example/transactional-mongoose/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/transactional.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "packages/transactional/**"
+      - "packages/transactional-typeorm/**"
+      - "packages/transactional-mongoose/**"
+      - "example/transactional-typeorm/**"
+      - "example/transactional-mongoose/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        typescript: ["5", "6"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Use TypeScript ${{ matrix.typescript }}
+        run: npm install --no-save --package-lock=false typescript@${{ matrix.typescript }}
+
+      - run: npm run build -w @nestplatform/common
+      - run: npm run build -w @nestplatform/transactional
+      - run: npm run build -w @nestplatform/transactional-typeorm
+      - run: npm run build -w @nestplatform/transactional-mongoose
+      - run: npm run build -w basic
+      - run: npm run build -w mongoose-example
+
+  typeorm-runtime:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build -w @nestplatform/common
+      - run: npm run build -w @nestplatform/transactional
+      - run: npm run build -w @nestplatform/transactional-typeorm
+      - run: npm run build -w basic
+
+      - name: Verify TypeORM transactional runtime
+        env:
+          PORT: 3001
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_DATABASE: postgres
+        run: npm run test:runtime -w basic
+
+  mongoose-runtime:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Start MongoDB replica set
+        run: |
+          docker run -d \
+            --name transactional-mongo \
+            -p 27017:27017 \
+            mongo:6 --replSet rs0 --bind_ip_all --port 27017
+          until docker exec transactional-mongo mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'; do
+            sleep 1
+          done
+          docker exec transactional-mongo mongosh --quiet --eval 'rs.initiate({_id:"rs0",members:[{_id:0,host:"localhost:27017"}]})'
+          until docker exec transactional-mongo mongosh --quiet --eval 'quit(rs.status().myState === 1 ? 0 : 1)'; do
+            sleep 1
+          done
+
+      - run: npm run build -w @nestplatform/common
+      - run: npm run build -w @nestplatform/transactional
+      - run: npm run build -w @nestplatform/transactional-mongoose
+      - run: npm run build -w mongoose-example
+
+      - name: Verify Mongoose transactional runtime
+        env:
+          PORT: 3002
+          MONGO_URI: mongodb://localhost:27017/mongo-local?replicaSet=rs0
+        run: npm run test:runtime -w mongoose-example
