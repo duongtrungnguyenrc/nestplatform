@@ -1,6 +1,6 @@
 {
   "name": "@nestplatform/transactional-typeorm",
-  "version": "1.1.2",
+  "version": "2.0.0",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,12 +11,16 @@
   "dependencies": {
     "@nestplatform/common": "^1.1.0"
   },
+  "devDependencies": {
+    "@nestjs/typeorm": "^11.0.3",
+    "typeorm": "^0.3.31"
+  },
   "peerDependencies": {
-    "@nestjs/common": "^10.0.0 || ^11.0.0",
-    "@nestjs/core": "^10.0.0 || ^11.0.0",
-    "@nestjs/typeorm": "^10.0.0 || ^11.0.0",
-    "@nestplatform/transactional": "^1.1.0",
-    "typeorm": "^0.3.0 || ^0.4.0"
+    "@nestjs/common": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0",
+    "@nestjs/core": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0",
+    "@nestjs/typeorm": "^9.0.0 || ^10.0.0 || ^11.0.0",
+    "@nestplatform/transactional": "^2.0.0",
+    "typeorm": "^0.3.0"
   },
   "keywords": [
     "transactional",

@@ -4,6 +4,7 @@ import { FeatureDecoration, stringifyMethod } from "@nestplatform/common";
 
 import { DEFAULT_TRANSACTION_ADAPTER, TRANSACTION_ADAPTERS } from "./transactional.constant";
 import { ITransactionAdapter } from "./interfaces";
+import { TransactionalProxyFactory } from "./transactional-proxy.factory";
 import { TransactionalOptions, TransactionAdapters, TransactionPropagation } from "./types";
 
 const LOGGING_CONTEXT = "TransactionalModule";
@@ -19,7 +20,10 @@ const LOGGING_CONTEXT = "TransactionalModule";
  */
 @Injectable()
 export class TransactionalFeatureDecoration extends FeatureDecoration {
-  constructor(@Inject(TRANSACTION_ADAPTERS) private readonly adapters: TransactionAdapters) {
+  constructor(
+    @(Inject(TRANSACTION_ADAPTERS) as ParameterDecorator) private readonly adapters: TransactionAdapters,
+    private readonly proxyFactory: TransactionalProxyFactory,
+  ) {
     super();
   }
 
@@ -50,7 +54,7 @@ export class TransactionalFeatureDecoration extends FeatureDecoration {
       }
 
       try {
-        const proxiedInstance = adapter.proxyInstance?.(instance);
+        const proxiedInstance = this.proxyFactory.createProxy(instance, adapter, adapterKey);
         const result = await adapter.execute(() => originalMethod.apply(proxiedInstance || instance, args), {
           propagation: options.propagation || TransactionPropagation.REQUIRED,
           isolation: options.isolation,

@@ -13,21 +13,21 @@
     "start:all": "concurrently \"npm run start:mock\" \"sleep 2 && npm run start:dev\""
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.1",
-    "@nestjs/core": "^11.0.1",
-    "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/common": "^11.1.28",
+    "@nestjs/core": "^11.1.28",
+    "@nestjs/platform-express": "^11.1.28",
     "@nestplatform/common": "^1.1.0",
     "@nestplatform/feign": "^1.1.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
-    "@nestjs/cli": "^11.0.0",
+    "@nestjs/cli": "^11.0.24",
     "@nestjs/schematics": "^11.0.0",
     "@types/node": "^22.10.7",
     "concurrently": "^9.1.2",
     "json-server": "^0.17.4",
-    "typescript": "^5.7.3"
+    "typescript": "^5.9.3"
   },
   "repository": {
     "type": "git",

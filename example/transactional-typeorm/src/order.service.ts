@@ -218,7 +218,7 @@ export class OrderService {
     }
 
     await this.orderRepo.update(orderId, {
-      amount: order.amount + adjustment,
+      amount: Number(order.amount) + adjustment,
     });
   }
 }

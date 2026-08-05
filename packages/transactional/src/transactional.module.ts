@@ -8,6 +8,7 @@ import { TransactionalMetadataExplorer } from "./transactional-metadata.explorer
 import { TransactionalFeatureDecoration } from "./transactional-feature.decoration";
 import { TransactionalMetadataAccessor } from "./transactional-metadata.accessor";
 import { TransactionalEventPublisher } from "./transactional-event.publisher";
+import { TransactionalProxyFactory } from "./transactional-proxy.factory";
 
 /**
  * Module that provides declarative transaction management.
@@ -38,6 +39,7 @@ export class TransactionalModule extends ConfigurableModule {
         TransactionalMetadataAccessor,
         TransactionalFeatureDecoration,
         TransactionalEventPublisher,
+        TransactionalProxyFactory,
       ],
       exports: [TransactionalEventPublisher],
     });
@@ -54,6 +56,7 @@ export class TransactionalModule extends ConfigurableModule {
         TransactionalMetadataAccessor,
         TransactionalFeatureDecoration,
         TransactionalEventPublisher,
+        TransactionalProxyFactory,
       ],
       exports: [TransactionalEventPublisher],
     });
