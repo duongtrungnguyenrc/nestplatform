@@ -66,6 +66,7 @@ jobs:
             packages/transactional
             packages/transactional-typeorm
             packages/transactional-mongoose
+            packages/transactional-pg
             packages/cacheable
             packages/distribution-lock
             packages/distribution-postgres-advisory-lock

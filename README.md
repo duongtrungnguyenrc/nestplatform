@@ -38,6 +38,7 @@ This monorepo contains a collection of NestJS support libraries focused on high-
 | `@nestplatform/transactional`                       | 2.0.x   | ORM-agnostic transactional management core for NestJS.                          | [README](packages/transactional/README.md)                       |
 | `@nestplatform/transactional-typeorm`               | 2.0.x   | TypeORM adapter for `@nestplatform/transactional`.                              | [README](packages/transactional-typeorm/README.md)               |
 | `@nestplatform/transactional-mongoose`              | 2.0.x   | Mongoose adapter for `@nestplatform/transactional`.                             | [README](packages/transactional-mongoose/README.md)              |
+| `@nestplatform/transactional-pg`                    | 2.0.x   | PostgreSQL `pg` adapter for `@nestplatform/transactional`.                      | [README](packages/transactional-pg/README.md)                    |
 | `@nestplatform/cacheable`                           | 1.1.x   | Spring-like declarative caching decorators for NestJS based on `cache-manager`. | [README](packages/cacheable/README.md)                           |
 | `@nestplatform/distribution-lock`                   | 1.1.x   | Shared distributed lock abstractions for NestJS applications.                   | [README](packages/distribution-lock/README.md)                   |
 | `@nestplatform/distribution-postgres-advisory-lock` | 1.1.x   | PostgreSQL advisory lock implementation for distributed locks.                  | [README](packages/distribution-postgres-advisory-lock/README.md) |
@@ -55,6 +56,10 @@ npm install @nestplatform/transactional @nestplatform/transactional-typeorm type
 
 ```bash
 npm install @nestplatform/transactional @nestplatform/transactional-mongoose mongoose @nestjs/mongoose
+```
+
+```bash
+npm install @nestplatform/transactional @nestplatform/transactional-pg pg
 ```
 
 ```bash
@@ -95,6 +100,7 @@ npm run build -w @nestplatform/common
 npm run build -w @nestplatform/transactional
 npm run build -w @nestplatform/transactional-typeorm
 npm run build -w @nestplatform/transactional-mongoose
+npm run build -w @nestplatform/transactional-pg
 ```
 
 ## CI/CD
@@ -143,6 +149,7 @@ Published `@nestplatform/*` libraries declare NestJS packages as peer dependenci
 | `@nestplatform/transactional`                       | 8, 9, 10, 11 | n/a                                                      | 5, 6       |
 | `@nestplatform/transactional-typeorm`               | 8, 9, 10, 11 | `@nestjs/typeorm` 9, 10, 11; TypeORM 0.3                 | 5, 6       |
 | `@nestplatform/transactional-mongoose`              | 8, 9, 10, 11 | `@nestjs/mongoose` 9, 10, 11; Mongoose 6, 7, 8, 9        | 5, 6       |
+| `@nestplatform/transactional-pg`                    | 8, 9, 10, 11 | `pg` 8 peer                                              | 5, 6       |
 | `@nestplatform/cacheable`                           | 9, 10, 11    | `@nestjs/cache-manager` 1, 2, 3; `cache-manager` 5, 6, 7 | 5, 6       |
 | `@nestplatform/distribution-lock`                   | 8, 9, 10, 11 | n/a                                                      | 5, 6       |
 | `@nestplatform/distribution-postgres-advisory-lock` | 8, 9, 10, 11 | `pg` 8 peer                                              | 5, 6       |
@@ -158,7 +165,7 @@ The compatibility matrix is enforced by GitHub Actions for published packages. T
 
 - Install peer dependencies explicitly in the application, not through transitive dependencies from this monorepo.
 - Keep NestJS package versions aligned across `@nestjs/common`, `@nestjs/core`, and integration packages such as `@nestjs/typeorm`, `@nestjs/mongoose`, or `@nestjs/cache-manager`.
-- Use `@nestplatform/transactional` 2.x with the matching 2.x TypeORM or Mongoose adapter packages.
+- Use `@nestplatform/transactional` 2.x with the matching 2.x TypeORM, Mongoose, or PG adapter packages.
 - Treat distributed locks as infrastructure-sensitive components: configure Redis or PostgreSQL connectivity, retry behavior, and observability according to your deployment model.
 - Run the example applications against real PostgreSQL, MongoDB, or Redis services before adopting the matching integration in production.
 

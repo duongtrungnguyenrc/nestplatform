@@ -1,0 +1,44 @@
+{
+  "name": "@nestplatform/transactional-pg",
+  "version": "2.0.0",
+  "description": "PG transaction adapter for @nestplatform/transactional",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@nestplatform/common": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.16.0",
+    "pg": "^8.22.0"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0",
+    "@nestjs/core": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0",
+    "@nestplatform/transactional": "^2.0.0",
+    "pg": "^8.0.0"
+  },
+  "keywords": [
+    "transactional",
+    "postgres",
+    "pg"
+  ],
+  "author": "Đường Trung Nguyên",
+  "license": "MIT",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duongtrungnguyenrc/nestplatform.git",
+    "directory": "packages/transactional-pg"
+  },
+  "bugs": {
+    "url": "https://github.com/duongtrungnguyenrc/nestplatform/issues"
+  },
+  "homepage": "https://github.com/duongtrungnguyenrc/nestplatform#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}
